@@ -1,4 +1,5 @@
 <?php
+
 namespace Netresearch\Contexts\Service;
 
 /***************************************************************
@@ -42,8 +43,7 @@ use TYPO3\CMS\Frontend\Page\PageRepositoryGetPageHookInterface;
  * @author  Christian Weiske <christian.weiske@netresearch.de>
  * @license http://opensource.org/licenses/gpl-license GPLv2 or later
  */
-class PageService
-    implements PageRepositoryGetPageHookInterface, AbstractMenuFilterPagesHookInterface, SingletonInterface
+class PageService implements PageRepositoryGetPageHookInterface, AbstractMenuFilterPagesHookInterface, SingletonInterface
 {
     /**
      * Add context filtering to an SQL query
@@ -71,10 +71,11 @@ class PageService
      *                                                   group access is disabled.
      *                                                   VERY rarely used
      * @param PageRepository $pObj                     t3lib_pageSelect object
-     * @return void
      */
     public function getPage_preProcess(
-        &$uid, &$disableGroupAccessCheck, PageRepository $pObj
+        &$uid,
+        &$disableGroupAccessCheck,
+        PageRepository $pObj
     ) {
         static $done = false;
         if ($done) {
@@ -102,31 +103,35 @@ class PageService
                     'Missing flat columns for setting "' . $setting . '"',
                     'tx_contexts',
                     2,
-                    array('table' => $table)
+                    ['table' => $table]
                 );
                 continue;
             }
 
-            $enableChecks = array(
-                $flatColumns[1] . " IS NULL",
+            $enableChecks = [
+                $flatColumns[1] . ' IS NULL',
                 $flatColumns[1] . " = ''"
-            );
-            $disableChecks = array();
+            ];
+            $disableChecks = [];
 
             foreach (Container::get() as $context) {
                 /* @var $context AbstractContext */
                 $enableChecks[] = $GLOBALS['TYPO3_DB']->listQuery(
-                    $flatColumns[1], $context->getUid(), $table
+                    $flatColumns[1],
+                    $context->getUid(),
+                    $table
                 );
                 $disableChecks[] = 'NOT ' . $GLOBALS['TYPO3_DB']->listQuery(
-                    $flatColumns[0], $context->getUid(), $table
+                    $flatColumns[0],
+                    $context->getUid(),
+                    $table
                 );
             }
 
             $sql = ' AND (' . implode(' OR ', $enableChecks) . ')';
             if (count($disableChecks)) {
                 $sql .= ' AND ('
-                    . $flatColumns[0] . " IS NULL"
+                    . $flatColumns[0] . ' IS NULL'
                     . ' OR ' . $flatColumns[0] . " = ''"
                     . ' OR (' . implode(' AND ', $disableChecks) . ')' .
                 ')';
@@ -142,7 +147,6 @@ class PageService
      * @param array &$params Array of parameters: hashParameters,
      *                       createLockHashBase
      * @param null  $ref     Reference object
-     * @return void
      */
     public function createHashBase(&$params, $ref)
     {
@@ -176,7 +180,10 @@ class PageService
      * @return bool Returns TRUE if the page can be safely included.
      */
     public function processFilter(
-        array &$data, array $banUidArray, $spacer, AbstractMenuContentObject $obj
+        array &$data,
+        array $banUidArray,
+        $spacer,
+        AbstractMenuContentObject $obj
     ) {
         return
         Record::isEnabled('pages', $data) &&

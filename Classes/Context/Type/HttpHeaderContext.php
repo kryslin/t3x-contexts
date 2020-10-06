@@ -1,4 +1,5 @@
 <?php
+
 namespace Netresearch\Contexts\Context\Type;
 
 /***************************************************************
@@ -41,7 +42,7 @@ class HttpHeaderContext extends AbstractContext
      *
      * @return bool True if the context is active, false if not
      */
-    public function match(array $arDependencies = array())
+    public function match(array $arDependencies = [])
     {
         // determine which HTTP header has been configured
         $httpHeaderName = trim(strtolower($this->getConfValue('field_name')));

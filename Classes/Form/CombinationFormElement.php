@@ -1,4 +1,5 @@
 <?php
+
 namespace Netresearch\Contexts\Form;
 
 /*
@@ -38,14 +39,16 @@ class CombinationFormElement
     public function render($arFieldInfo, FormEngine $formEngineObject)
     {
         $text = $formEngineObject->getSingleField_typeText(
-            $arFieldInfo['table'], $arFieldInfo['field'],
-            $arFieldInfo['row'], $arFieldInfo
+            $arFieldInfo['table'],
+            $arFieldInfo['field'],
+            $arFieldInfo['row'],
+            $arFieldInfo
         );
         $evaluator = new LogicalExpressionEvaluator();
         $arTokens = $evaluator->tokenize($arFieldInfo['itemFormElValue']);
 
-        $arNotFound = array();
-        $arUnknownTokens = array();
+        $arNotFound = [];
+        $arUnknownTokens = [];
         foreach ($arTokens as $token) {
             if (is_array($token)
                 && $token[0] === LogicalExpressionEvaluator::T_VAR

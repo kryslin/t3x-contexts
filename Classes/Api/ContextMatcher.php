@@ -1,4 +1,5 @@
 <?php
+
 namespace Netresearch\Contexts\Api;
 
 /***************************************************************
@@ -45,7 +46,7 @@ class ContextMatcher
      *
      * @var array
      */
-    protected $arMatches = array();
+    protected $arMatches = [];
 
     /**
      * Singleton
@@ -62,8 +63,6 @@ class ContextMatcher
 
     /**
      * Unsets this instance
-     *
-     * @return void
      */
     public static function clearInstance()
     {

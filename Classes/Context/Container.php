@@ -1,4 +1,5 @@
 <?php
+
 namespace Netresearch\Contexts\Context;
 
 /*
@@ -15,6 +16,8 @@ namespace Netresearch\Contexts\Context;
  */
 
 use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Core\Database\Connection;
+use TYPO3\CMS\Core\Database\ConnectionPool;
 
 /**
  * Loads contexts and provides access to them
@@ -71,14 +74,15 @@ class Container extends \ArrayObject
     protected function setActive($arContexts)
     {
         $this->exchangeArray($arContexts);
-        $aliases = array();
+        $aliases = [];
         foreach ($arContexts as $context) {
             $aliases[] = $context->getAlias();
         }
-        GeneralUtility::devLog(
-            count($this) . ' active contexts: ' . implode(', ', $aliases),
-            'tx_contexts', 0
-        );
+//        GeneralUtility::devLog(
+//            count($this) . ' active contexts: ' . implode(', ', $aliases),
+//            'tx_contexts',
+//            0
+//        );
 
         return $this;
     }
@@ -92,11 +96,17 @@ class Container extends \ArrayObject
      */
     protected function loadAvailable()
     {
-        $arRows = $GLOBALS['TYPO3_DB']->exec_SELECTgetRows(
-            '*', 'tx_contexts_contexts', 'deleted=0'
-        );
+        /** @var Connection $connection */
+        $connection = GeneralUtility::makeInstance(ConnectionPool::class)->getConnectionByName('Default');
+        $qb = $connection->createQueryBuilder();
 
-        $contexts = array();
+        $qb
+            ->select('*')
+            ->from('tx_contexts_contexts');
+
+        $arRows = $qb->execute()->fetchAllAssociative();
+
+        $contexts = [];
         foreach ($arRows as $arRow) {
             $context = Factory::createFromDb($arRow);
             if ($context !== null) {
@@ -117,8 +127,8 @@ class Container extends \ArrayObject
      */
     protected function match($arContexts)
     {
-        $matched          = array();
-        $notMatched       = array();
+        $matched          = [];
+        $notMatched       = [];
         $arContextsHelper = $arContexts;
 
         $loops = 0;
@@ -137,23 +147,23 @@ class Container extends \ArrayObject
                 foreach ($arDeps as $depUid => $enabled) {
                     if ($enabled) {
                         if (isset($matched[$depUid])) {
-                            $arDeps[$depUid] = (object) array(
+                            $arDeps[$depUid] = (object)[
                                 'context' => $matched[$depUid],
                                 'matched' => true
-                            );
+                            ];
                             $unresolvedDeps--;
                         } elseif (isset($notMatched[$depUid])) {
-                            $arDeps[$depUid] = (object) array(
+                            $arDeps[$depUid] = (object)[
                                 'context' => $notMatched[$depUid],
                                 'matched' => false
-                            );
+                            ];
                             $unresolvedDeps--;
                         }
                     } else {
-                        $arDeps[$depUid] = (object) array(
+                        $arDeps[$depUid] = (object)[
                             'context' => $arContextsHelper[$depUid],
                             'matched' => 'disabled'
-                        );
+                        ];
                         $unresolvedDeps--;
                     }
                     // FIXME: what happens when dependency context is not

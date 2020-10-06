@@ -1,4 +1,5 @@
 <?php
+
 namespace Netresearch\Contexts\Service;
 
 /*
@@ -28,7 +29,7 @@ class FrontendControllerService implements SingletonInterface
      *
      * @var array
      */
-    protected static $params = array();
+    protected static $params = [];
 
     /**
      * GET parameters that are carried across all URLs.
@@ -36,14 +37,12 @@ class FrontendControllerService implements SingletonInterface
      *
      * @var array
      */
-    protected static $linkVarParams = array();
+    protected static $linkVarParams = [];
 
     /**
      * Initialize the frontend user - contexts are initialized here.
      *
      * @param TypoScriptFrontendController $pObj Calling object
-     *
-     * @return void
      */
     public function initFEuser($pObj)
     {
@@ -68,9 +67,8 @@ class FrontendControllerService implements SingletonInterface
             //check extendtosubpages
             if ($page['extendToSubpages'] == '0' && $bFindExtendSubPage == 0) {
                 continue;
-            } else {
-                $bFindExtendSubPage = 1;
             }
+            $bFindExtendSubPage = 1;
 
             $arEnable = explode(',', $page['tx_contexts_enable']);
             foreach ($arEnable as $nContextId) {
@@ -98,7 +96,6 @@ class FrontendControllerService implements SingletonInterface
      *
      * @param array &$params Array of parameters
      * @param null  $ref     Empty reference object
-     * @return void
      */
     public function createHashBase(&$params, $ref)
     {
@@ -111,7 +108,6 @@ class FrontendControllerService implements SingletonInterface
      *
      * @param array    &$params
      * @param TypoScriptFrontendController $tsfe
-     * @return void
      */
     public function configArrayPostProc(&$params, $tsfe)
     {
@@ -125,7 +121,6 @@ class FrontendControllerService implements SingletonInterface
      *
      * @param string $param
      * @param mixed  $value
-     * @return void
      */
     public static function registerQueryParameter($param, $value, $addToLinkVars)
     {

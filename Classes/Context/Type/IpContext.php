@@ -1,4 +1,5 @@
 <?php
+
 namespace Netresearch\Contexts\Context\Type;
 
 /***************************************************************
@@ -41,15 +42,19 @@ class IpContext extends AbstractContext
      *
      * @return bool True if the context is active, false if not
      */
-    public function match(array $arDependencies = array())
+    public function match(array $arDependencies = [])
     {
         $strCurIp = $_SERVER['REMOTE_ADDR'];
 
         $bIpv4 = filter_var(
-            $strCurIp, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4
+            $strCurIp,
+            FILTER_VALIDATE_IP,
+            FILTER_FLAG_IPV4
         ) !== false;
         $bIpv6 = filter_var(
-            $strCurIp, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6
+            $strCurIp,
+            FILTER_VALIDATE_IP,
+            FILTER_FLAG_IPV6
         ) !== false;
 
         if (!$bIpv4 && !$bIpv6) {
@@ -82,8 +87,7 @@ class IpContext extends AbstractContext
     {
         if ($bIpv4) {
             return GeneralUtility::cmpIPv4($strIp, $strRange);
-        } else {
-            return GeneralUtility::cmpIPv6($strIp, $strRange);
         }
+        return GeneralUtility::cmpIPv6($strIp, $strRange);
     }
 }

@@ -1,4 +1,5 @@
 <?php
+
 namespace Netresearch\Contexts\Service;
 
 /***************************************************************
@@ -41,8 +42,6 @@ class IconService implements SingletonInterface
      * @param string $table   Name of the table to inspect.
      * @param array  $row     The row of the actuall element.
      * @param array  &$status The actually status which already is set.
-     *
-     * @return void
      */
     public function overrideIconOverlay($table, $row, &$status)
     {
@@ -51,7 +50,6 @@ class IconService implements SingletonInterface
             $status['contexts'] = true;
         }
     }
-
 
     /**
      * Add a "contexts" icon to the standard page/content element item

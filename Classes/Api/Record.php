@@ -1,4 +1,5 @@
 <?php
+
 namespace Netresearch\Contexts\Api;
 
 /***************************************************************
@@ -84,14 +85,14 @@ class Record
                     'Missing uid field in row',
                     'tx_contexts',
                     GeneralUtility::SYSLOG_SEVERITY_WARNING,
-                    array('table' => $table, 'row' => $row)
+                    ['table' => $table, 'row' => $row]
                 );
                 return false;
             }
 
-            $uid = (int) $row['uid'];
+            $uid = (int)$row['uid'];
         } else {
-            $uid = (int) $row;
+            $uid = (int)$row;
         }
 
         /* @var $context AbstractContext */
@@ -117,7 +118,7 @@ class Record
      * @param string $setting Setting name
      * @param array  $row     Record array
      *
-     * @return null|bool NULL when table has no flat settings or the record
+     * @return bool|null NULL when table has no flat settings or the record
      *                      doesn't contain the appropriate flat columns
      *                      boolean otherwise
      */
@@ -131,7 +132,7 @@ class Record
         }
 
         $rowValid           = true;
-        $flatColumnContents = array();
+        $flatColumnContents = [];
 
         foreach ($flatColumns as $i => $flatColumn) {
             if (!array_key_exists($flatColumn, $row)) {
@@ -139,14 +140,14 @@ class Record
                     'Missing flat field "' . $flatColumn . '"',
                     'tx_contexts',
                     GeneralUtility::SYSLOG_SEVERITY_WARNING,
-                    array('table' => $table, 'row' => $row)
+                    ['table' => $table, 'row' => $row]
                 );
                 $rowValid = false;
             } elseif ($row[$flatColumn] !== '') {
                 $flatColumnContents[$i]
                     = array_flip(explode(',', $row[$flatColumn]));
             } else {
-                $flatColumnContents[$i] = array();
+                $flatColumnContents[$i] = [];
             }
         }
 

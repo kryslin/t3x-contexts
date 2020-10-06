@@ -1,4 +1,5 @@
 <?php
+
 namespace Netresearch\Contexts\Service;
 
 /***************************************************************
@@ -24,8 +25,10 @@ namespace Netresearch\Contexts\Service;
 *  This copyright notice MUST APPEAR in all copies of the script!
 ***************************************************************/
 use Netresearch\Contexts\Api\Configuration;
-use TYPO3\CMS\Core\Database\DatabaseConnection;
+use TYPO3\CMS\Core\Database\Connection;
+use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\DataHandling\DataHandler;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
  * Class for TCEmain-hooks: Capture incoming default and record settings
@@ -46,17 +49,19 @@ class DataHandlerService
      * @param string        $table
      * @param string        $id
      * @param DataHandler   &$reference
-     * @return void
      */
     public function processDatamap_preProcessFieldArray(
-        &$incomingFieldArray, $table, $id, &$reference
+        &$incomingFieldArray,
+        $table,
+        $id,
+        &$reference
     ) {
         if (!is_array($incomingFieldArray)) {
             // some strange DB situation
             return;
         }
 
-        if ($table == 'tx_contexts_contexts'
+        if ($table === 'tx_contexts_contexts'
             && isset($incomingFieldArray['default_settings'])
             && is_array($incomingFieldArray['default_settings'])
         ) {
@@ -79,16 +84,19 @@ class DataHandlerService
      * @param string        $id
      * @param array         $fieldArray
      * @param DataHandler   $reference
-     * @return void
      */
     public function processDatamap_afterDatabaseOperations(
-        $status, $table, $id, $fieldArray, $reference
+        $status,
+        $table,
+        $id,
+        $fieldArray,
+        $reference
     ) {
         if (is_array($this->currentSettings)) {
             if (!is_numeric($id)) {
                 $id = $reference->substNEWwithIDs[$id];
             }
-            if ($table == 'tx_contexts_contexts') {
+            if ($table === 'tx_contexts_contexts') {
                 $this->saveDefaultSettings($id, $this->currentSettings);
             } else {
                 $this->saveRecordSettings($table, $id, $this->currentSettings);
@@ -107,43 +115,61 @@ class DataHandlerService
      * @param string $table
      * @param int    $uid
      * @param array  $contextsAndSettings
-     * @return void
      */
     protected function saveRecordSettings($table, $uid, $contextsAndSettings)
     {
         $flatSettingColumns = Configuration::getFlatColumns(
             $table
         );
-        /** @var DatabaseConnection $databaseConnection */
-        $databaseConnection = $GLOBALS['TYPO3_DB'];
 
         foreach ($contextsAndSettings as $contextId => $settings) {
             foreach ($settings as $field => $setting) {
                 if (isset($flatSettingColumns[$field])) {
                     continue;
                 }
-                $row = $databaseConnection->exec_SELECTgetSingleRow(
-                    'uid',
-                    'tx_contexts_settings',
-                    'context_uid = ' . (int)$contextId .  ' AND ' .
-                    'foreign_table = ' . $databaseConnection->fullQuoteStr($table, 'tx_contexts_settings') . ' AND ' .
-                    'name = ' . $databaseConnection->fullQuoteStr($field, 'tx_contexts_settings') . ' AND ' .
-                    'foreign_uid = ' . (int)$uid
-                );
+                $queryBuilder = $this->getDatabaseConnection()->createQueryBuilder();
+                $queryBuilder
+                    ->select('uid')
+                    ->from('tx_contexts_settings')
+                    ->where('context_uid = :context_uid')
+                    ->andWhere('foreign_table = :foreign_table')
+                    ->andWhere('name = :name')
+                    ->andWhere('foreign_uid = :foreign_uid')
+                    ->setParameters([
+                        'context_uid' => (int)$contextId,
+                        'foreign_table' => $table,
+                        'name' => $field,
+                        'foreign_uid' => (int)$uid
+                    ]);
+                $row = $queryBuilder->execute()->fetchAssociative();
                 if ($setting === '0' || $setting === '1') {
+                    $queryBuilder = $this->getDatabaseConnection()->createQueryBuilder();
                     if ($row) {
-                        $databaseConnection->exec_UPDATEquery('tx_contexts_settings', 'uid=' . (int)$row['uid'], array('enabled' => $setting));
+                        $queryBuilder
+                            ->update('tx_contexts_settings')
+                            ->set('enabled', $setting)
+                            ->where('uid = :uid')
+                            ->setParameter('uid', (int)$row['uid'])
+                            ->execute();
                     } else {
-                        $databaseConnection->exec_INSERTquery('tx_contexts_settings', array(
-                            'context_uid' => $contextId,
-                            'foreign_table' => $table,
-                            'name' => $field,
-                            'foreign_uid' => $uid,
-                            'enabled' => $setting
-                        ));
+                        $queryBuilder
+                            ->insert('tx_contexts_settings')
+                            ->values([
+                                'context_uid' => $contextId,
+                                'foreign_table' => $table,
+                                'name' => $field,
+                                'foreign_uid' => $uid,
+                                'enabled' => $setting
+                            ])
+                            ->execute();
                     }
                 } elseif ($row) {
-                    $databaseConnection->exec_DELETEquery('tx_contexts_settings', 'uid=' . (int)$row['uid']);
+                    $queryBuilder = $this->getDatabaseConnection()->createQueryBuilder();
+                    $queryBuilder
+                        ->delete('tx_contexts_settings')
+                        ->where('uid = :uid')
+                        ->setParameter('uid', (int)$row['uid'])
+                        ->execute();
                 }
             }
         }
@@ -164,17 +190,16 @@ class DataHandlerService
      *                                    tx_contexts_visibility => '',
      *                                    menu_visibility => '0'
      *                                    '' = undecided, 1 - on, 0 - off
-     * @return void
      * @see FrontendControllerService::enableFields()
      */
     protected function saveFlatSettings($table, $uid, $contextsAndSettings)
     {
-        $values = array();
+        $values = [];
 
         $flatSettingColumns = Configuration::getFlatColumns($table);
         foreach ($flatSettingColumns as $setting => $flatColumns) {
-            $values[$flatColumns[0]] = array();
-            $values[$flatColumns[1]] = array();
+            $values[$flatColumns[0]] = [];
+            $values[$flatColumns[1]] = [];
             foreach ($contextsAndSettings as $contextId => $settings) {
                 if ($settings[$setting] === '0' || $settings[$setting] === '1') {
                     $values[$flatColumns[$settings[$setting]]][] = $contextId;
@@ -183,12 +208,15 @@ class DataHandlerService
         }
 
         if (count($values)) {
-            foreach ($values as $colname => &$val) {
-                $val = implode(',', $val);
+            $queryBuilder = $this->getDatabaseConnection()->createQueryBuilder();
+            $queryBuilder->update($table);
+            foreach ($values as $colname => $val) {
+                $queryBuilder->set($colname, implode(',', $val));
             }
-            $GLOBALS['TYPO3_DB']->exec_UPDATEquery(
-                $table, 'uid=' . (int)$uid, $values
-            );
+            $queryBuilder
+                ->where('uid = :uid')
+                ->setParameter('uid', (int)$uid)
+                ->execute();
         }
     }
 
@@ -198,43 +226,54 @@ class DataHandlerService
      *
      * @param int $contextId
      * @param array $settings
-     * @return void
      */
     protected function saveDefaultSettings($contextId, $settings)
     {
-        $existingSettings = (array)$GLOBALS['TYPO3_DB']->exec_SELECTgetRows(
-            '*',
-            'tx_contexts_settings',
-            'context_uid = ' . (int)$contextId . ' AND foreign_uid = 0'
-        );
+        $queryBuilder = $this->getDatabaseConnection()->createQueryBuilder();
+        $queryBuilder
+            ->select('*')
+            ->from('tx_contexts_settings')
+            ->where('context_uid = :context_uid')
+            ->where('foreign_uid = 0')
+            ->setParameter('uid', (int)$contextId);
+
+        $existingSettings = $queryBuilder->execute()->fetchAllAssociative();
 
         foreach ($settings as $table => $fields) {
-            $fieldSettings = array();
+            $fieldSettings = [];
             foreach ($existingSettings as $setting) {
-                if ($setting['foreign_table'] == $table) {
+                if ($setting['foreign_table'] === $table) {
                     $fieldSettings[$setting['name']] = $setting['uid'];
                 }
             }
             foreach ($fields as $field => $enabled) {
                 if (array_key_exists($field, $fieldSettings)) {
-                    $GLOBALS['TYPO3_DB']->exec_UPDATEquery(
-                        'tx_contexts_settings',
-                        'uid=' . (int)$fieldSettings[$field],
-                        array('enabled' => (int)$enabled)
-                    );
+                    $queryBuilder = $this->getDatabaseConnection()->createQueryBuilder();
+                    $queryBuilder
+                        ->update('tx_contexts_settings')
+                        ->set('enabled', (int)$enabled)
+                        ->where('uid = :uid')
+                        ->setParameter('uid', (int)$fieldSettings[$field])
+                        ->execute();
                 } else {
-                    $GLOBALS['TYPO3_DB']->exec_INSERTquery(
-                        'tx_contexts_settings',
-                        array(
+                    $queryBuilder = $this->getDatabaseConnection()->createQueryBuilder();
+                    $queryBuilder
+                        ->insert('tx_contexts_settings')
+                        ->values([
                             'context_uid' => $contextId,
                             'foreign_table' => $table,
                             'name' => $field,
                             'foreign_uid' => 0,
                             'enabled' => (int)$enabled
-                        )
-                    );
+                        ])
+                        ->execute();
                 }
             }
         }
+    }
+
+    protected function getDatabaseConnection(): Connection
+    {
+        return GeneralUtility::makeInstance(ConnectionPool::class)->getConnectionByName('Default');
     }
 }

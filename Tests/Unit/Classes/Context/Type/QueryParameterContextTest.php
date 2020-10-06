@@ -1,4 +1,5 @@
 <?php
+
 namespace Netresearch\Contexts\Tests\Unit\Context\Type;
 
 class QueryParameterContextTest extends \PHPUnit_Framework_TestCase
@@ -16,19 +17,19 @@ class QueryParameterContextTest extends \PHPUnit_Framework_TestCase
     {
         $getm = $this->getMock(
             '\Netresearch\Contexts\Context\Type\QueryParameterContext',
-            array('getConfValue')
+            ['getConfValue']
         );
         $getm->setUseSession(false);
-        $retValMap = array(
-            array('field_name'       , null, 'sDEF', 'lDEF', 'vDEF', 'affID'),
-            array('field_values'     , null, 'sDEF', 'lDEF', 'vDEF', '123'),
-        );
+        $retValMap = [
+            ['field_name'       , null, 'sDEF', 'lDEF', 'vDEF', 'affID'],
+            ['field_values'     , null, 'sDEF', 'lDEF', 'vDEF', '123'],
+        ];
 
-        $getm->expects($this->any())
+        $getm->expects(self::any())
             ->method('getConfValue')
-            ->will($this->returnValueMap($retValMap));
+            ->willReturnMap($retValMap);
 
-        $this->assertFalse($getm->match(), 'No parameter means no match');
+        self::assertFalse($getm->match(), 'No parameter means no match');
     }
 
     public function testMatchParameterNoValue()
@@ -37,19 +38,19 @@ class QueryParameterContextTest extends \PHPUnit_Framework_TestCase
 
         $getm = $this->getMock(
             '\Netresearch\Contexts\Context\Type\QueryParameterContext',
-            array('getConfValue')
+            ['getConfValue']
         );
         $getm->setUseSession(false);
-        $retValMap = array(
-            array('field_name'       , null, 'sDEF', 'lDEF', 'vDEF', 'affID'),
-            array('field_values'     , null, 'sDEF', 'lDEF', 'vDEF', '123'),
-        );
+        $retValMap = [
+            ['field_name'       , null, 'sDEF', 'lDEF', 'vDEF', 'affID'],
+            ['field_values'     , null, 'sDEF', 'lDEF', 'vDEF', '123'],
+        ];
 
-        $getm->expects($this->any())
+        $getm->expects(self::any())
             ->method('getConfValue')
-            ->will($this->returnValueMap($retValMap));
+            ->willReturnMap($retValMap);
 
-        $this->assertFalse($getm->match(), 'No value means no match');
+        self::assertFalse($getm->match(), 'No value means no match');
     }
 
     public function testMatchParameterCorrectValue()
@@ -58,19 +59,19 @@ class QueryParameterContextTest extends \PHPUnit_Framework_TestCase
 
         $getm = $this->getMock(
             '\Netresearch\Contexts\Context\Type\QueryParameterContext',
-            array('getConfValue')
+            ['getConfValue']
         );
         $getm->setUseSession(false);
-        $retValMap = array(
-            array('field_name'       , null, 'sDEF', 'lDEF', 'vDEF', 'affID'),
-            array('field_values'     , null, 'sDEF', 'lDEF', 'vDEF', '123'),
-        );
+        $retValMap = [
+            ['field_name'       , null, 'sDEF', 'lDEF', 'vDEF', 'affID'],
+            ['field_values'     , null, 'sDEF', 'lDEF', 'vDEF', '123'],
+        ];
 
-        $getm->expects($this->any())
+        $getm->expects(self::any())
             ->method('getConfValue')
-            ->will($this->returnValueMap($retValMap));
+            ->willReturnMap($retValMap);
 
-        $this->assertTrue($getm->match(), 'Correct value');
+        self::assertTrue($getm->match(), 'Correct value');
     }
 
     public function testMatchParameterCorrectValueOfMany()
@@ -79,22 +80,22 @@ class QueryParameterContextTest extends \PHPUnit_Framework_TestCase
 
         $getm = $this->getMock(
             '\Netresearch\Contexts\Context\Type\QueryParameterContext',
-            array('getConfValue')
+            ['getConfValue']
         );
         $getm->setUseSession(false);
-        $retValMap = array(
-            array('field_name'       , null, 'sDEF', 'lDEF', 'vDEF', 'affID'),
-            array(
+        $retValMap = [
+            ['field_name'       , null, 'sDEF', 'lDEF', 'vDEF', 'affID'],
+            [
                 'field_values'     , null, 'sDEF', 'lDEF', 'vDEF',
                 "123\n124\n125\n"
-            ),
-        );
+            ],
+        ];
 
-        $getm->expects($this->any())
+        $getm->expects(self::any())
             ->method('getConfValue')
-            ->will($this->returnValueMap($retValMap));
+            ->willReturnMap($retValMap);
 
-        $this->assertTrue($getm->match(), 'Correct value');
+        self::assertTrue($getm->match(), 'Correct value');
     }
 
     public function testMatchParameterWrongValueOfMany()
@@ -103,22 +104,22 @@ class QueryParameterContextTest extends \PHPUnit_Framework_TestCase
 
         $getm = $this->getMock(
             '\Netresearch\Contexts\Context\Type\QueryParameterContext',
-            array('getConfValue')
+            ['getConfValue']
         );
         $getm->setUseSession(false);
-        $retValMap = array(
-            array('field_name'       , null, 'sDEF', 'lDEF', 'vDEF', 'affID'),
-            array(
+        $retValMap = [
+            ['field_name'       , null, 'sDEF', 'lDEF', 'vDEF', 'affID'],
+            [
                 'field_values'     , null, 'sDEF', 'lDEF', 'vDEF',
                 "123\n124\n125\n"
-            ),
-        );
+            ],
+        ];
 
-        $getm->expects($this->any())
+        $getm->expects(self::any())
             ->method('getConfValue')
-            ->will($this->returnValueMap($retValMap));
+            ->willReturnMap($retValMap);
 
-        $this->assertFalse($getm->match(), 'value is not allowed');
+        self::assertFalse($getm->match(), 'value is not allowed');
     }
 
     public function testMatchParameterAnyValue()
@@ -127,19 +128,19 @@ class QueryParameterContextTest extends \PHPUnit_Framework_TestCase
 
         $getm = $this->getMock(
             '\Netresearch\Contexts\Context\Type\QueryParameterContext',
-            array('getConfValue')
+            ['getConfValue']
         );
         $getm->setUseSession(false);
-        $retValMap = array(
-            array('field_name'       , null, 'sDEF', 'lDEF', 'vDEF', 'affID'),
-            array('field_values'     , null, 'sDEF', 'lDEF', 'vDEF', ''),
-        );
+        $retValMap = [
+            ['field_name'       , null, 'sDEF', 'lDEF', 'vDEF', 'affID'],
+            ['field_values'     , null, 'sDEF', 'lDEF', 'vDEF', ''],
+        ];
 
-        $getm->expects($this->any())
+        $getm->expects(self::any())
             ->method('getConfValue')
-            ->will($this->returnValueMap($retValMap));
+            ->willReturnMap($retValMap);
 
-        $this->assertTrue($getm->match(), 'Any value is correct');
+        self::assertTrue($getm->match(), 'Any value is correct');
     }
 
     public function testMatchParameterAnyValueMissing()
@@ -148,19 +149,19 @@ class QueryParameterContextTest extends \PHPUnit_Framework_TestCase
 
         $getm = $this->getMock(
             '\Netresearch\Contexts\Context\Type\QueryParameterContext',
-            array('getConfValue')
+            ['getConfValue']
         );
         $getm->setUseSession(false);
-        $retValMap = array(
-            array('field_name'       , null, 'sDEF', 'lDEF', 'vDEF', 'affID'),
-            array('field_values'     , null, 'sDEF', 'lDEF', 'vDEF', ''),
-        );
+        $retValMap = [
+            ['field_name'       , null, 'sDEF', 'lDEF', 'vDEF', 'affID'],
+            ['field_values'     , null, 'sDEF', 'lDEF', 'vDEF', ''],
+        ];
 
-        $getm->expects($this->any())
+        $getm->expects(self::any())
             ->method('getConfValue')
-            ->will($this->returnValueMap($retValMap));
+            ->willReturnMap($retValMap);
 
-        $this->assertFalse($getm->match(), 'Any value is missing');
+        self::assertFalse($getm->match(), 'Any value is missing');
     }
 
     /**
@@ -170,20 +171,18 @@ class QueryParameterContextTest extends \PHPUnit_Framework_TestCase
     {
         $getm = $this->getMock(
             '\Netresearch\Contexts\Context\Type\QueryParameterContext',
-            array('getConfValue')
+            ['getConfValue']
         );
         $getm->setUseSession(false);
-        $retValMap = array(
-            array('field_name'       , null, 'sDEF', 'lDEF', 'vDEF', ''),
-            array('field_values'     , null, 'sDEF', 'lDEF', 'vDEF', ''),
-        );
+        $retValMap = [
+            ['field_name'       , null, 'sDEF', 'lDEF', 'vDEF', ''],
+            ['field_values'     , null, 'sDEF', 'lDEF', 'vDEF', ''],
+        ];
 
-        $getm->expects($this->any())
+        $getm->expects(self::any())
             ->method('getConfValue')
-            ->will($this->returnValueMap($retValMap));
+            ->willReturnMap($retValMap);
 
         $getm->match();
     }
-
 }
-?>

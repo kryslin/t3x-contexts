@@ -1,4 +1,5 @@
 <?php
+
 namespace Netresearch\Contexts\Context\Type;
 
 /***************************************************************
@@ -40,11 +41,12 @@ class SessionContext extends AbstractContext
      *
      * @return bool True if the context is active, false if not
      */
-    public function match(array $arDependencies = array())
+    public function match(array $arDependencies = [])
     {
         /* @var $GLOBALS['TSFE'] \TYPO3\CMS\Frontend\Controller\TypoScriptFrontendController */
         $session = $GLOBALS['TSFE']->fe_user->getKey(
-            'ses', $this->getConfValue('field_variable')
+            'ses',
+            $this->getConfValue('field_variable')
         );
 
         return $this->invert($session !== null);

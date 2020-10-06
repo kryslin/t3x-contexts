@@ -1,4 +1,5 @@
 <?php
+
 namespace Netresearch\Contexts\Api;
 
 /***************************************************************
@@ -24,8 +25,6 @@ namespace Netresearch\Contexts\Api;
 *  This copyright notice MUST APPEAR in all copies of the script!
 ***************************************************************/
 
-use Netresearch\Contexts\Form\DefaultSettingsFormElement;
-use Netresearch\Contexts\Form\RecordSettingsFormElement;
 use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
 
 /**
@@ -51,7 +50,6 @@ class Configuration
      * @var string
      */
     const RECORD_SETTINGS_COLUMN = 'tx_contexts_settings';
-
 
     /**
      * Add context settings to a specific table. $settings can be
@@ -86,22 +84,23 @@ class Configuration
      *                                Key is the setting name, value its config
      * @param bool    $addDefaults If an "enableSetting" is added that is
      *                                used to hide/show elements
-     *
-     * @return void
      */
     public static function enableContextsForTable(
-        $extKey, $table, array $settings = null, $addDefaults = true
+        $extKey,
+        $table,
+        array $settings = null,
+        $addDefaults = true
     ) {
-        $defaultSettings = array(
-            'tx_contexts' => array(
+        $defaultSettings = [
+            'tx_contexts' => [
                 'label' => 'LLL:' . self::LANG_FILE . ':tx_contexts_visibility',
                 'flatten' => true,
                 'enables' => true
-            )
-        );
+            ]
+        ];
 
         if (!is_array($settings)) {
-            $settings = $addDefaults ? $defaultSettings : array();
+            $settings = $addDefaults ? $defaultSettings : [];
         } elseif ($addDefaults) {
             $settings = array_merge($defaultSettings, $settings);
         }
@@ -132,19 +131,17 @@ class Configuration
      *
      * @param string $table    Table name
      * @param array  $settings Settings
-     *
-     * @return void
      */
     protected static function addToFlatColumns($table, array $settings)
     {
-        $flatSettings = (array) $GLOBALS['TCA'][$table]['ctrl']['tx_contexts']['flatSettings'];
+        $flatSettings = (array)$GLOBALS['TCA'][$table]['ctrl']['tx_contexts']['flatSettings'];
 
         foreach ($settings as $setting => $config) {
             if (self::isFlatSetting($config)) {
-                $flatSettings[$setting] = array(
+                $flatSettings[$setting] = [
                     0 => $setting . '_disable',
                     1 => $setting . '_enable',
-                );
+                ];
             }
         }
 
@@ -159,13 +156,13 @@ class Configuration
      * @param string $extKey   Extension key
      * @param string $table    Table name
      * @param array  $settings Settings
-     *
-     * @return void
      */
     protected static function addToExtensionFlatSettings(
-        $extKey, $table, array $settings
+        $extKey,
+        $table,
+        array $settings
     ) {
-        $flatSettings = array();
+        $flatSettings = [];
 
         foreach ($settings as $setting => $config) {
             if (self::isFlatSetting($config)) {
@@ -173,10 +170,10 @@ class Configuration
             }
         }
 
-        if (!array_key_exists($extKey, (array) $GLOBALS['TCA']['tx_contexts_contexts']['extensionFlatSettings'])) {
+        if (!array_key_exists($extKey, (array)$GLOBALS['TCA']['tx_contexts_contexts']['extensionFlatSettings'])) {
             $GLOBALS['TCA']['tx_contexts_contexts']['extensionFlatSettings'][$extKey]
-                = array($table => $flatSettings);
-        } elseif (!array_key_exists($table, (array) $GLOBALS['TCA']['tx_contexts_contexts']['extensionFlatSettings'][$extKey])) {
+                = [$table => $flatSettings];
+        } elseif (!array_key_exists($table, (array)$GLOBALS['TCA']['tx_contexts_contexts']['extensionFlatSettings'][$extKey])) {
             $GLOBALS['TCA']['tx_contexts_contexts']['extensionFlatSettings'][$extKey][$table] = $flatSettings;
         } else {
             $GLOBALS['TCA']['tx_contexts_contexts']['extensionFlatSettings'][$extKey][$table] = array_unique(
@@ -194,12 +191,10 @@ class Configuration
      *
      * @param string $table    Table name
      * @param array  $settings Settings
-     *
-     * @return void
      */
     protected static function addToEnableSettings($table, array $settings)
     {
-        $enableSettings = (array) $GLOBALS['TCA'][$table]['ctrl']['tx_contexts']['enableSettings'];
+        $enableSettings = (array)$GLOBALS['TCA'][$table]['ctrl']['tx_contexts']['enableSettings'];
 
         foreach ($settings as $setting => $config) {
             if (isset($config['enables'])
@@ -218,8 +213,6 @@ class Configuration
      * @param string $table    Table to add settings to
      * @param array  $settings Array of settings to register.
      *                         Key is the setting name, value its title
-     *
-     * @return void
      */
     protected static function addToTcaColumns($table, array $settings)
     {
@@ -228,27 +221,27 @@ class Configuration
         }
 
         if (!array_key_exists(self::RECORD_SETTINGS_COLUMN, $GLOBALS['TCA'][$table]['columns'])) {
-            $recordSettingsConf = array(
+            $recordSettingsConf = [
                 'exclude' => 1,
                 'label' => 'LLL:' . self::LANG_FILE . ':tabname',
-                'config' => array(
+                'config' => [
                     'type' => 'user',
                     'size' => '30',
-                    'userFunc' => 'Netresearch\Contexts\Form\RecordSettingsFormElement->render',
+                    'renderType' => 'RecordSettingsFormElement',
                     'settings' => $settings,
-                ),
-            );
-            $arColumns = array(
+                ],
+            ];
+            $arColumns = [
                 self::RECORD_SETTINGS_COLUMN => $recordSettingsConf
-            );
+            ];
             $arFlatColumns = self::getFlatColumns($table);
             if (count($arFlatColumns)) {
                 //add passthrough fields to keep settings when copying records
                 foreach ($arFlatColumns as $arSetting) {
                     foreach ($arSetting as $columnName) {
-                        $arColumns[$columnName] = array(
-                            'config' => array('type' => 'passthrough')
-                        );
+                        $arColumns[$columnName] = [
+                            'config' => ['type' => 'passthrough']
+                        ];
                     }
                 }
             }
@@ -292,23 +285,24 @@ class Configuration
         $defaultSettingsColumn = 'default_settings_' . $table;
 
         if (!array_key_exists($defaultSettingsColumn, $GLOBALS['TCA']['tx_contexts_contexts']['columns'])) {
-            $defaultSettingsConf = array(
+            $defaultSettingsConf = [
                 'exclude' => 1,
                 'label' => $GLOBALS['TCA'][$table]['ctrl']['title'],
-                'config' => array(
+                'config' => [
                     'type' => 'user',
                     'size' => 30,
                     'userFunc' => 'Netresearch\Contexts\Form\DefaultSettingsFormElement->render',
+                    'renderType' => 'DefaultSettingsFormElement',
                     'table' => $table,
                     'settings' => $settings
-                )
-            );
+                ]
+            ];
 
             ExtensionManagementUtility::addTCAcolumns(
                 'tx_contexts_contexts',
-                array(
+                [
                     $defaultSettingsColumn => $defaultSettingsConf
-                )
+                ]
             );
 
             ExtensionManagementUtility::addToAllTCAtypes(
@@ -335,22 +329,22 @@ class Configuration
      * @param string $title    Title of context inside dropdown
      * @param string $class    Name of class implementing context type
      * @param string $flexFile Flexform configuration file of context type
-     *
-     * @return void
      */
     public static function registerContextType(
-        $key, $title, $class, $flexFile
+        $key,
+        $title,
+        $class,
+        $flexFile
     ) {
-
-        $GLOBALS['TCA']['tx_contexts_contexts']['contextTypes'][$key] = array(
+        $GLOBALS['TCA']['tx_contexts_contexts']['contextTypes'][$key] = [
             'title'    => $title,
             'class'    => $class,
             'flexFile' => $flexFile,
-        );
+        ];
 
         if (isset($GLOBALS['TCA']['tx_contexts_contexts']['columns']['type'])) {
             $GLOBALS['TCA']['tx_contexts_contexts']['columns']['type']['config']
-                ['items'][] = array($title, $key);
+                ['items'][] = [$title, $key];
             $GLOBALS['TCA']['tx_contexts_contexts']['columns']['type_conf']['config']
                 ['ds'][$key] = $flexFile;
         }
@@ -363,7 +357,7 @@ class Configuration
      */
     public static function getContextTypes()
     {
-        return (array) $GLOBALS['TCA']['tx_contexts_contexts']['contextTypes'];
+        return (array)$GLOBALS['TCA']['tx_contexts_contexts']['contextTypes'];
     }
 
     /**
@@ -395,7 +389,7 @@ class Configuration
             }
         }
 
-        return array();
+        return [];
     }
 
     /**
@@ -408,7 +402,7 @@ class Configuration
     public static function getExtensionFlatSettings($strExtKey)
     {
         if (!isset($GLOBALS['TCA']['tx_contexts_contexts']['extensionFlatSettings'][$strExtKey])) {
-            return array();
+            return [];
         }
 
         return $GLOBALS['TCA']['tx_contexts_contexts']['extensionFlatSettings'];
@@ -423,6 +417,6 @@ class Configuration
      */
     public static function getEnableSettings($table)
     {
-        return (array) $GLOBALS['TCA'][$table]['ctrl']['tx_contexts']['enableSettings'];
+        return (array)$GLOBALS['TCA'][$table]['ctrl']['tx_contexts']['enableSettings'];
     }
 }

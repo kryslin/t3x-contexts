@@ -14,7 +14,6 @@ define(
 
 require_once TEST_PATH . '../../../../typo3/sysext/core/Classes/Core/Bootstrap.php';
 
-
 \TYPO3\CMS\Core\Core\Bootstrap::getInstance()
     ->baseSetup('')
     ->loadConfigurationAndInitialize()
@@ -22,5 +21,3 @@ require_once TEST_PATH . '../../../../typo3/sysext/core/Classes/Core/Bootstrap.p
     ->applyAdditionalConfigurationSettings()
     ->initializeTypo3DbGlobal()
     ->loadExtensionTables();
-
-?>

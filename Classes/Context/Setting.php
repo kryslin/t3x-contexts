@@ -1,4 +1,5 @@
 <?php
+
 namespace Netresearch\Contexts\Context;
 
 /*
@@ -55,10 +56,10 @@ final class Setting
     public function __construct(AbstractContext $context, array $row)
     {
         $this->context = $context;
-        $this->uid = (int) $row['uid'];
+        $this->uid = (int)$row['uid'];
         $this->foreignTable = $row['foreign_table'];
         $this->name = $row['name'];
-        $this->foreignUid = (int) $row['foreign_uid'];
+        $this->foreignUid = (int)$row['foreign_uid'];
         $this->enabled = $row['enabled'] ? true : false;
     }
 
@@ -69,7 +70,10 @@ final class Setting
      */
     public static function fromFlatData(
         AbstractContext $context,
-        $table, $setting, $arFlatColumns, $arRow
+        $table,
+        $setting,
+        $arFlatColumns,
+        $arRow
     ) {
         $bDisabled = strpos(
             ',' . $arRow[$arFlatColumns[0]] . ',',
@@ -84,13 +88,13 @@ final class Setting
             return null;
         }
 
-        $arDummyRow = array(
+        $arDummyRow = [
             'uid'  => null,
             'name' => $setting,
             'foreign_table' => $table,
             'foreign_uid'   => null,
             'enabled' => $bEnabled
-        );
+        ];
         return new self($context, $arDummyRow);
     }
 

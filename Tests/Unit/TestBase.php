@@ -43,4 +43,3 @@ abstract class TestBase extends \PHPUnit_Framework_TestCase
         return $m->invokeArgs($obj, $params);
     }
 }
-?>

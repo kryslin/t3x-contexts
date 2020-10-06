@@ -1,4 +1,5 @@
 <?php
+
 namespace Netresearch\Contexts\Context\Type;
 
 /***************************************************************
@@ -43,7 +44,7 @@ class QueryParameterContext extends AbstractContext
      * @return bool True if the context is active, false if not
      * @throws \Exception
      */
-    public function match(array $arDependencies = array())
+    public function match(array $arDependencies = [])
     {
         $param = trim($this->getConfValue('field_name'));
         if ($param === '') {
@@ -63,7 +64,9 @@ class QueryParameterContext extends AbstractContext
 
         // Register param on TSFE service for cache and linkVars management
         FrontendControllerService::registerQueryParameter(
-            $param, $value, !(bool) $this->use_session
+            $param,
+            $value,
+            !(bool)$this->use_session
         );
 
         $values = GeneralUtility::trimExplode("\n", $this->getConfValue('field_values'), true);

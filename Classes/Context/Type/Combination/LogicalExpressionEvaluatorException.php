@@ -1,4 +1,5 @@
 <?php
+
 namespace Netresearch\Contexts\Context\Type\Combination;
 
 /***************************************************************

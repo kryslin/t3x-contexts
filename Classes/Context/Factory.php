@@ -1,4 +1,5 @@
 <?php
+
 namespace Netresearch\Contexts\Context;
 
 /***************************************************************
@@ -50,10 +51,11 @@ class Factory
         $type     = $arRow['type'];
 
         if (!$type || !array_key_exists($type, $classMap)) {
-            GeneralUtility::devLog(
-                'No class found for context type "' . $type . '"',
-                'tx_contexts', 2
-            );
+//            GeneralUtility::devLog(
+//                'No class found for context type "' . $type . '"',
+//                'tx_contexts',
+//                2
+//            );
             $type = 'default';
         }
 

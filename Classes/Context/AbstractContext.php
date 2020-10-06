@@ -1,4 +1,5 @@
 <?php
+
 namespace Netresearch\Contexts\Context;
 
 /***************************************************************
@@ -25,8 +26,9 @@ namespace Netresearch\Contexts\Context;
 ***************************************************************/
 
 use Netresearch\Contexts\Api\Configuration;
+use TYPO3\CMS\Core\Database\Connection;
+use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3\CMS\Frontend\Controller\TypoScriptFrontendController;
 
 /**
  * Abstract context - must be extended by the context types
@@ -111,7 +113,7 @@ abstract class AbstractContext
      *
      * @var array
      */
-    private $settings = array();
+    private $settings = [];
 
     /**
      * Constructor - set the values from database row.
@@ -131,14 +133,14 @@ abstract class AbstractContext
      *
      * @param array $arRow Database context row
      */
-    public function __construct($arRow = array())
+    public function __construct($arRow = [])
     {
         //check TSFE is set
         //prevent Exceptions in eID
         $this->initTsfe();
 
         if (!empty($arRow)) {
-            $this->uid            = (int) $arRow['uid'];
+            $this->uid            = (int)$arRow['uid'];
             $this->type           = $arRow['type'];
             $this->title          = $arRow['title'];
             $this->alias          = $arRow['alias'];
@@ -146,7 +148,7 @@ abstract class AbstractContext
             $this->invert         = $arRow['invert'];
             $this->use_session    = $arRow['use_session'];
             $this->disabled       = $arRow['disabled'];
-            $this->bHideInBackend = (bool) $arRow['hide_in_backend'];
+            $this->bHideInBackend = (bool)$arRow['hide_in_backend'];
 
             if ($arRow['type_conf'] != '') {
                 $this->conf = GeneralUtility::xml2array($arRow['type_conf']);
@@ -205,13 +207,18 @@ abstract class AbstractContext
             // database row instead of relying on the tx_contexts_settings
             // table
             $arFlatColumns = Configuration::getFlatColumns(
-                $table, $setting
+                $table,
+                $setting
             );
             if (isset($arRow[$arFlatColumns[0]])
                 && isset($arRow[$arFlatColumns[1]])
             ) {
                 return Setting::fromFlatData(
-                    $this, $table, $setting, $arFlatColumns, $arRow
+                    $this,
+                    $table,
+                    $setting,
+                    $arFlatColumns,
+                    $arRow
                 );
             }
         }
@@ -241,23 +248,30 @@ abstract class AbstractContext
             return $this->settings[$settingsKey];
         }
 
-        $uids = array($uid);
+        $uids = [$uid];
         if ($uid && !array_key_exists($table . '.0', $this->settings)) {
             $uids[] = 0;
         }
 
-        $where = 'context_uid = ' . $this->uid;
-        $where .= " AND foreign_table = '$table'";
-        $where .= " AND foreign_uid IN ('" . implode("','", $uids) . "')";
+        /** @var Connection $connection */
+        $connection = GeneralUtility::makeInstance(ConnectionPool::class)->getConnectionByName('Default');
+        $qb = $connection->createQueryBuilder();
+        $qb
+            ->select('*')
+            ->from('tx_contexts_settings')
+            ->where('context_uid = :context_uid')
+            ->andWhere('foreign_table = :foreign_table')
+            ->andWhere('foreign_uid IN (:foreign_uid)')
+            ->setParameters([
+                'context_uid' => $this->uid,
+                'foreign_table' => $table,
+                'foreign_uid' => implode("','", $uids)
+            ]);
 
-        $rows = $GLOBALS['TYPO3_DB']->exec_SELECTgetRows(
-            '*',
-            'tx_contexts_settings',
-            $where
-        );
+        $rows = $qb->execute()->fetchAllAssociative();
 
         foreach ($uids as $uid) {
-            $this->settings[$table . '.' . $uid] = array();
+            $this->settings[$table . '.' . $uid] = [];
         }
 
         if (is_array($rows)) {
@@ -292,7 +306,7 @@ abstract class AbstractContext
      *
      * @return bool True when your context matches, false if not
      */
-    abstract public function match(array $arDependencies = array());
+    abstract public function match(array $arDependencies = []);
 
     /**
      * Get the uid of this context.
@@ -344,7 +358,7 @@ abstract class AbstractContext
      */
     public function getDependencies($arContexts)
     {
-        return array();
+        return [];
     }
 
     /**
@@ -377,19 +391,19 @@ abstract class AbstractContext
      */
     protected function getMatchFromSession()
     {
-        $bUseSession = (bool) $this->use_session;
+        $bUseSession = (bool)$this->use_session;
 
         if (!$bUseSession) {
-            return array(false, null);
+            return [false, null];
         }
 
         $res = $this->getSession();
 
         if ($res === null) {
             //not set yet
-            return array(false, null);
+            return [false, null];
         }
-        return array(true, (bool) $res);
+        return [true, (bool)$res];
     }
 
     /**
@@ -400,7 +414,8 @@ abstract class AbstractContext
     protected function getSession()
     {
         return $GLOBALS['TSFE']->fe_user->getKey(
-            'ses', 'contexts-' . $this->uid . '-' . $this->tstamp
+            'ses',
+            'contexts-' . $this->uid . '-' . $this->tstamp
         );
     }
 
@@ -414,13 +429,15 @@ abstract class AbstractContext
      */
     protected function storeInSession($bMatch)
     {
-        if (!((bool) $this->use_session)) {
+        if (!((bool)$this->use_session)) {
             return $bMatch;
         }
 
         /* @var $GLOBALS['TSFE'] tslib_feuserauth */
         $GLOBALS['TSFE']->fe_user->setKey(
-            'ses', 'contexts-' . $this->uid . '-' . $this->tstamp, $bMatch
+            'ses',
+            'contexts-' . $this->uid . '-' . $this->tstamp,
+            $bMatch
         );
         $GLOBALS['TSFE']->storeSessionData();
         return $bMatch;
@@ -428,15 +445,15 @@ abstract class AbstractContext
 
     /**
      * Init TSFE with FE user
-     *
-     * @return void
      */
     protected function initTsfe()
     {
         if (!isset($GLOBALS['TSFE']) && TYPO3_MODE === 'FE') {
             $GLOBALS['TSFE'] = GeneralUtility::makeInstance(
                 'TYPO3\CMS\Frontend\Controller\TypoScriptFrontendController',
-                $GLOBALS['TYPO3_CONF_VARS'], 0, 0
+                $GLOBALS['TYPO3_CONF_VARS'],
+                0,
+                0
             );
             $GLOBALS['TSFE']->initFEuser();
         }
@@ -451,7 +468,7 @@ abstract class AbstractContext
      */
     protected function invert($bMatch)
     {
-        if ((bool) $this->invert) {
+        if ((bool)$this->invert) {
             return !$bMatch;
         }
 
@@ -462,24 +479,20 @@ abstract class AbstractContext
      * Set invert flag.
      *
      * @param bool $bInvert True or false
-     *
-     * @return void
      */
     public function setInvert($bInvert)
     {
-        $this->invert = (bool) $bInvert;
+        $this->invert = (bool)$bInvert;
     }
 
     /**
      * Set use session flag.
      *
      * @param bool $bUseSession True or false
-     *
-     * @return void
      */
     public function setUseSession($bUseSession)
     {
-        $this->use_session = (bool) $bUseSession;
+        $this->use_session = (bool)$bUseSession;
     }
 
     /**

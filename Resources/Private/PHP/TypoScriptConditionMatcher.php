@@ -29,7 +29,7 @@
  *
  * @param string $strContext context alias
  *
- * @return boolean True if it matches, false if not
+ * @return bool True if it matches, false if not
  */
 function user_contexts_matches($strContext)
 {

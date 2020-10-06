@@ -1,4 +1,5 @@
 <?php
+
 namespace Netresearch\Contexts\Context\Type;
 
 /*
@@ -21,7 +22,7 @@ use Netresearch\Contexts\Context\AbstractContext;
  */
 class DomainContext extends AbstractContext
 {
-    public function match(array $arDependencies = array())
+    public function match(array $arDependencies = [])
     {
         $curHost = $_SERVER['HTTP_HOST'];
         $arDomains = explode("\n", $this->getConfValue('field_domains'));

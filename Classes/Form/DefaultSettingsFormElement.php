@@ -1,4 +1,5 @@
 <?php
+
 namespace Netresearch\Contexts\Form;
 
 /*
@@ -16,39 +17,36 @@ namespace Netresearch\Contexts\Form;
 
 use Netresearch\Contexts\Context\AbstractContext;
 use Netresearch\Contexts\Context\Container;
-use TYPO3\CMS\Backend\Form\FormEngine;
+use TYPO3\CMS\Backend\Form\Element\AbstractFormElement;
 
 /**
  * USER functions to render the defaults fields
  *
  * @author Christian Opitz <christian.opitz@netresearch.de>
  */
-class DefaultSettingsFormElement
+class DefaultSettingsFormElement extends AbstractFormElement
 {
     /**
      * Render a checkbox for the default settings of records in
      * this table
-     *
-     * @param array $params
-     * @param FormEngine $formEngineObject
-     * @return string
      */
-    public function render($params, $formEngineObject)
+    public function render()
     {
-        $table = $params['fieldConf']['config']['table'];
+        $result = $this->initializeResultArray();
+        $table = $this->data['tableName'];
 
         $content = '';
 
-        $namePre = str_replace('[default_settings_', '[default_settings][', $params['itemFormElName']);
+        $namePre = str_replace('[default_settings_', '[default_settings][', $this->data['parameterArray']['itemFormElName']);
 
         /* @var $context AbstractContext */
-        $uid = (int)$params['row']['uid'];
+        $uid = (int)$this->data['databaseRow']['uid'];
         $context = $uid
             ? Container::get()->initAll()->find($uid)
             : null;
 
-        foreach ($params['fieldConf']['config']['settings'] as $setting => $config) {
-            $id = $params['itemFormElID'] . '-' . $setting;
+        foreach ($this->data['parameterArray']['fieldConf']['config']['settings'] as $setting => $config) {
+            $id = $this->data['parameterArray']['itemFormElID'] . '-' . $setting;
             $name = $namePre . '[' . $setting . ']';
             $content .= '<input type="hidden" name="' . $name . '" value="0"/>';
             $content .= '<input class="checkbox" type="checkbox" name="' . $name . '" ';
@@ -65,6 +63,8 @@ class DefaultSettingsFormElement
             $content .= '</label><br/>';
         }
 
-        return $content;
+        $result['html'] = $content;
+
+        return $result;
     }
 }
