@@ -238,7 +238,7 @@ abstract class AbstractContext
      *
      * @return array Array of settings
      *               Key is the context column name (e.g. "tx_contexts_nav")
-     *               Value is a Tx_Contexts_Context_Setting object
+     *               Value is a Netresearch\Contexts\Context\Setting object
      */
     final public function getSettings($table, $uid): array
     {
@@ -333,7 +333,7 @@ abstract class AbstractContext
      *
      * @return string
      */
-    public function getTitle(): string
+    public function getTitle(): ?string
     {
         return $this->title;
     }

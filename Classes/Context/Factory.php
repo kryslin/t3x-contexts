@@ -73,7 +73,7 @@ class Factory
         }
         if (!$instance instanceof AbstractContext) {
             throw new ContextException(
-                $class . ' must extend Tx_Contexts_Context_Abstract'
+                $class . ' ' . AbstractContext::class
             );
         }
         return $instance;

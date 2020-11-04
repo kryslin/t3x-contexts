@@ -76,7 +76,7 @@ class Configuration
      * The extKey is necessary as it will be collected when you add flat
      * settings. A hook for the EM will then add the required columns on $table
      * on installation/update of your extension in EM.
-     * (@see Tx_Contexts_Service_Install::appendTableDefinitions())
+     * (@see \Netresearch\Contexts\Service\InstallService::appendTableDefinitions())
      *
      * @param string     $extKey      Extension key that ena the table
      * @param string     $table       Table to add settings to

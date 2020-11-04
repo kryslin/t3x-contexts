@@ -115,7 +115,7 @@ class Container extends \ArrayObject
      * Loads all available contexts from database and instantiates them
      * and checks if they match.
      *
-     * @return array Array of available Tx_Contexts_Context_Abstract objects,
+     * @return array Array of available Netresearch\Contexts\Context\AbstractContext objects,
      *               key is their uid
      */
     protected function loadAvailable(): array
@@ -146,7 +146,7 @@ class Container extends \ArrayObject
      *
      * @param array $arContexts Array of available context objects
      *
-     * @return array Array of matched Tx_Contexts_Context_Abstract objects,
+     * @return array Array of matched Netresearch\Contexts\Context\AbstractContext objects,
      *               key is their uid
      */
     protected function match($arContexts): array
