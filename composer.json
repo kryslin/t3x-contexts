@@ -21,11 +21,12 @@
   ],
   "license": "GPL-2.0+",
   "require": {
-    "typo3/cms-core": "^6.2.14 || ^7.6 || ^8.0"
+    "typo3/cms-core": "^10.0"
   },
   "require-dev": {
+    "roave/security-advisories": "dev-master",
     "namelesscoder/typo3-repository-client": "^1.2",
-    "mikey179/vfsStream": "^1.4",
+    "mikey179/vfsstream": "^1.4",
     "phpunit/phpunit": "^4.7 || ^5.0"
   },
   "autoload": {
