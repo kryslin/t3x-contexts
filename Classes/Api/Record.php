@@ -47,7 +47,7 @@ class Record
      *
      * @return bool
      */
-    public static function isEnabled($table, $row)
+    public static function isEnabled($table, $row): bool
     {
         $enableSettings = Configuration::getEnableSettings($table);
         if (!$enableSettings) {
@@ -71,7 +71,7 @@ class Record
      *
      * @return bool
      */
-    public static function isSettingEnabled($table, $setting, $row)
+    public static function isSettingEnabled($table, $setting, $row): bool
     {
         if (is_array($row)) {
             $enabledFlat = self::isSettingEnabledFlat($table, $setting, $row);
@@ -81,12 +81,12 @@ class Record
             }
 
             if (!isset($row['uid'])) {
-                GeneralUtility::devLog(
-                    'Missing uid field in row',
-                    'tx_contexts',
-                    GeneralUtility::SYSLOG_SEVERITY_WARNING,
-                    ['table' => $table, 'row' => $row]
-                );
+//                GeneralUtility::devLog(
+//                    'Missing uid field in row',
+//                    'tx_contexts',
+//                    GeneralUtility::SYSLOG_SEVERITY_WARNING,
+//                    ['table' => $table, 'row' => $row]
+//                );
                 return false;
             }
 
@@ -122,7 +122,7 @@ class Record
      *                      doesn't contain the appropriate flat columns
      *                      boolean otherwise
      */
-    protected static function isSettingEnabledFlat($table, $setting, array $row)
+    protected static function isSettingEnabledFlat($table, $setting, array $row): ?bool
     {
         $flatColumns
             = Configuration::getFlatColumns($table, $setting);
@@ -136,12 +136,12 @@ class Record
 
         foreach ($flatColumns as $i => $flatColumn) {
             if (!array_key_exists($flatColumn, $row)) {
-                GeneralUtility::devLog(
-                    'Missing flat field "' . $flatColumn . '"',
-                    'tx_contexts',
-                    GeneralUtility::SYSLOG_SEVERITY_WARNING,
-                    ['table' => $table, 'row' => $row]
-                );
+//                GeneralUtility::devLog(
+//                    'Missing flat field "' . $flatColumn . '"',
+//                    'tx_contexts',
+//                    GeneralUtility::SYSLOG_SEVERITY_WARNING,
+//                    ['table' => $table, 'row' => $row]
+//                );
                 $rowValid = false;
             } elseif ($row[$flatColumn] !== '') {
                 $flatColumnContents[$i]

@@ -34,7 +34,7 @@ class RecordSettingsFormElement extends AbstractFormElement
      * Render the context settings field for a certain table
      * @return array
      */
-    public function render()
+    public function render(): array
     {
         $result = $this->initializeResultArray();
         $table = $this->data['tableName'];
@@ -146,7 +146,7 @@ class RecordSettingsFormElement extends AbstractFormElement
      * @param mixed   $uid   The uid of the record OR if file, just blank value.
      * @return string HTML
      */
-    protected function getClickMenu($str, $table, $uid = '')
+    protected function getClickMenu($str, $table, $uid = ''): string
     {
         $nVersion = VersionNumberUtility::convertVersionNumberToInteger(
             TYPO3_version

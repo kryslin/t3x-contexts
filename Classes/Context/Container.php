@@ -15,6 +15,8 @@ namespace Netresearch\Contexts\Context;
  * The TYPO3 project - inspiring people to share!
  */
 
+use Psr\Http\Message\ServerRequestInterface;
+use TYPO3\CMS\Core\Context\Context;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Core\Database\Connection;
 use TYPO3\CMS\Core\Database\ConnectionPool;
@@ -30,11 +32,16 @@ class Container extends \ArrayObject
     protected static $instance;
 
     /**
+     * @var ServerRequestInterface
+     */
+    protected $request;
+
+    /**
      * Singleton accessor
      *
      * @return Container
      */
-    public static function get()
+    public static function get(): self
     {
         if (static::$instance === null) {
             static::$instance = new self();
@@ -42,12 +49,28 @@ class Container extends \ArrayObject
         return static::$instance;
     }
 
+    public function setRequest(ServerRequestInterface $request): self
+    {
+        $this->request = $request;
+        return $this;
+    }
+
+    public function getRequest(): ServerRequestInterface
+    {
+        return $this->request;
+    }
+
+    public function getContext(): Context
+    {
+        return GeneralUtility::makeInstance(Context::class);
+    }
+
     /**
      * Loads all contexts and checks if they match
      *
      * @return Container
      */
-    public function initMatching()
+    public function initMatching(): self
     {
         $this->setActive($this->match($this->loadAvailable()));
         return $this;
@@ -58,7 +81,7 @@ class Container extends \ArrayObject
      *
      * @return Container
      */
-    public function initAll()
+    public function initAll(): self
     {
         $this->setActive($this->loadAvailable());
         return $this;
@@ -71,7 +94,7 @@ class Container extends \ArrayObject
      *
      * @return Container
      */
-    protected function setActive($arContexts)
+    protected function setActive($arContexts): self
     {
         $this->exchangeArray($arContexts);
         $aliases = [];
@@ -94,7 +117,7 @@ class Container extends \ArrayObject
      * @return array Array of available Tx_Contexts_Context_Abstract objects,
      *               key is their uid
      */
-    protected function loadAvailable()
+    protected function loadAvailable(): array
     {
         /** @var Connection $connection */
         $connection = GeneralUtility::makeInstance(ConnectionPool::class)->getConnectionByName('Default');
@@ -125,7 +148,7 @@ class Container extends \ArrayObject
      * @return array Array of matched Tx_Contexts_Context_Abstract objects,
      *               key is their uid
      */
-    protected function match($arContexts)
+    protected function match($arContexts): array
     {
         $matched          = [];
         $notMatched       = [];
@@ -194,7 +217,7 @@ class Container extends \ArrayObject
      *
      * @return AbstractContext
      */
-    public function find($uidOrAlias)
+    public function find($uidOrAlias): ?AbstractContext
     {
         if (is_numeric($uidOrAlias) && isset($this[$uidOrAlias])) {
             return $this[$uidOrAlias];

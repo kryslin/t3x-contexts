@@ -2,6 +2,8 @@
 
 namespace Netresearch\Contexts\Context\Type\Combination;
 
+use stdClass;
+
 /***************************************************************
 *  Copyright notice
 *
@@ -37,55 +39,55 @@ class LogicalExpressionEvaluator
      * Identifier for any unknown token
      * @var int
      */
-    const T_UNKNOWN = 0;
+    public const T_UNKNOWN = 0;
 
     /**
      * Identifier for && token
      * @var int
      */
-    const T_AND = 1;
+    public const T_AND = 1;
 
     /**
      * Identifier for || token
      * @var int
      */
-    const T_OR = 2;
+    public const T_OR = 2;
 
     /**
      * Identifier for >< token
      * @var int
      */
-    const T_XOR = 3;
+    public const T_XOR = 3;
 
     /**
      * Identifier for ! token
      * @var int
      */
-    const T_NEGATE = 4;
+    public const T_NEGATE = 4;
 
     /**
      * Identifier for ( token
      * @var int
      */
-    const T_PL = 5;
+    public const T_PL = 5;
 
     /**
      * Identifier for ) token
      * @var int
      */
-    const T_PR = 6;
+    public const T_PR = 6;
 
     /**
      * Identifier for variable tokens
      * @var int
      */
-    const T_VAR = 7;
+    public const T_VAR = 7;
 
     /**
      * Identifier for end token
      * @var int
      */
-    const T_END = 8;
+    public const T_END = 8;
 
     /**
      * Scope container - required to share the scope array
@@ -120,7 +122,7 @@ class LogicalExpressionEvaluator
 
     /**
      * Set on scopes by pushToken() when they are negated
-     * @var unknown_type
+     * @var bool
      */
     protected $negated = false;
 
@@ -151,7 +153,7 @@ class LogicalExpressionEvaluator
      * @param array $values
      * @return bool
      */
-    public static function run($expression, $values)
+    public static function run($expression, $values): bool
     {
         $evaluator = new self();
         $evaluator->parse($evaluator->tokenize($expression));
@@ -167,7 +169,7 @@ class LogicalExpressionEvaluator
      * @param string $expression
      * @return array
      */
-    public function tokenize($expression)
+    public function tokenize($expression): array
     {
         $expression = preg_replace(
             [
@@ -182,7 +184,7 @@ class LogicalExpressionEvaluator
             ],
             $expression
         );
-        $pattern = '/[^\w-_]/';
+        $pattern = '/[^\w\-_]/';
         preg_match_all($pattern, $expression . ' ', $operators, PREG_OFFSET_CAPTURE);
         $nextPosition = 0;
         $tokens = [];
@@ -229,7 +231,7 @@ class LogicalExpressionEvaluator
      *
      * @param array $tokens
      */
-    public function parse($tokens)
+    public function parse($tokens): void
     {
         $this->scopeContainer = new \stdClass();
         $this->scopeContainer->scopes = [];
@@ -248,7 +250,7 @@ class LogicalExpressionEvaluator
      * Instantiate and push a scope to the scope stack
      * and increase the pointer stack
      */
-    protected function pushScope()
+    protected function pushScope(): void
     {
         $scope = new self();
         $scope->parentScope = $this;
@@ -261,7 +263,7 @@ class LogicalExpressionEvaluator
     /**
      * Pop the current scope (key)
      */
-    protected function popScope()
+    protected function popScope(): void
     {
         array_pop($this->scopeContainer->keys);
     }
@@ -271,7 +273,7 @@ class LogicalExpressionEvaluator
      *
      * @return LogicalExpressionEvaluator
      */
-    protected function getScope()
+    protected function getScope(): LogicalExpressionEvaluator
     {
         return $this->scopeContainer->scopes[end($this->scopeContainer->keys)];
     }
@@ -283,7 +285,7 @@ class LogicalExpressionEvaluator
      * @param int|array $token
      * @throws LogicalExpressionEvaluatorException
      */
-    protected function handleToken($token)
+    protected function handleToken($token): void
     {
         switch ($token) {
             case self::T_NEGATE:
@@ -353,7 +355,7 @@ class LogicalExpressionEvaluator
      * @param int|array|LogicalExpressionEvaluator $token
      * @throws LogicalExpressionEvaluatorException
      */
-    protected function pushToken($token)
+    protected function pushToken($token): void
     {
         if ($this->nextTokenNegated) {
             if (is_array($token)) {
@@ -377,7 +379,7 @@ class LogicalExpressionEvaluator
      *
      * @param array $precedences
      */
-    protected function precedenceShiftTokens($precedences)
+    protected function precedenceShiftTokens($precedences): void
     {
         $operator = array_shift($precedences);
         if (!$operator) {
@@ -411,7 +413,7 @@ class LogicalExpressionEvaluator
      * @throws LogicalExpressionEvaluatorException
      * @return bool
      */
-    public function evaluate(array $values)
+    public function evaluate(array $values): bool
     {
         // default if no operator isset
         $value = false;
@@ -471,7 +473,7 @@ class LogicalExpressionEvaluator
      * @param bool $unshifted
      * @return string
      */
-    public function rebuild($unshifted = false)
+    public function rebuild($unshifted = false): string
     {
         $parts = [];
         foreach ($this->tokens as $i => $token) {

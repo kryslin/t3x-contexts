@@ -55,7 +55,7 @@ class DataHandlerService
         $table,
         $id,
         &$reference
-    ) {
+    ): void {
         if (!is_array($incomingFieldArray)) {
             // some strange DB situation
             return;
@@ -91,7 +91,7 @@ class DataHandlerService
         $id,
         $fieldArray,
         $reference
-    ) {
+    ): void {
         if (is_array($this->currentSettings)) {
             if (!is_numeric($id)) {
                 $id = $reference->substNEWwithIDs[$id];
@@ -116,7 +116,7 @@ class DataHandlerService
      * @param int    $uid
      * @param array  $contextsAndSettings
      */
-    protected function saveRecordSettings($table, $uid, $contextsAndSettings)
+    protected function saveRecordSettings($table, $uid, $contextsAndSettings): void
     {
         $flatSettingColumns = Configuration::getFlatColumns(
             $table
@@ -192,7 +192,7 @@ class DataHandlerService
      *                                    '' = undecided, 1 - on, 0 - off
      * @see FrontendControllerService::enableFields()
      */
-    protected function saveFlatSettings($table, $uid, $contextsAndSettings)
+    protected function saveFlatSettings($table, $uid, $contextsAndSettings): void
     {
         $values = [];
 
@@ -227,7 +227,7 @@ class DataHandlerService
      * @param int $contextId
      * @param array $settings
      */
-    protected function saveDefaultSettings($contextId, $settings)
+    protected function saveDefaultSettings($contextId, $settings): void
     {
         $queryBuilder = $this->getDatabaseConnection()->createQueryBuilder();
         $queryBuilder

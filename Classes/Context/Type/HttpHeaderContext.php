@@ -42,7 +42,7 @@ class HttpHeaderContext extends AbstractContext
      *
      * @return bool True if the context is active, false if not
      */
-    public function match(array $arDependencies = [])
+    public function match(array $arDependencies = []): bool
     {
         // determine which HTTP header has been configured
         $httpHeaderName = trim(strtolower($this->getConfValue('field_name')));

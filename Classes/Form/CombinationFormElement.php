@@ -17,7 +17,7 @@ namespace Netresearch\Contexts\Form;
 
 use Netresearch\Contexts\Context\Container;
 use Netresearch\Contexts\Context\Type\Combination\LogicalExpressionEvaluator;
-use TYPO3\CMS\Backend\Form\FormEngine;
+use TYPO3\CMS\Backend\Form\Element\TextElement;
 
 /**
  * Provides methods used in the backend by flexforms.
@@ -27,56 +27,45 @@ use TYPO3\CMS\Backend\Form\FormEngine;
  * @license    http://opensource.org/licenses/gpl-license GPLv2 or later
  * @link       http://github.com/netresearch/contexts
  */
-class CombinationFormElement
+class CombinationFormElement extends TextElement
 {
-    /**
-     * Display a textarea with validation for the entered aliases and expressions
-     *
-     * @param array          $arFieldInfo Information about the current input field
-     * @param FormEngine     $formEngineObject    Form rendering library object
-     * @return string HTML code
-     */
-    public function render($arFieldInfo, FormEngine $formEngineObject)
+    public function render(): array
     {
-        $text = $formEngineObject->getSingleField_typeText(
-            $arFieldInfo['table'],
-            $arFieldInfo['field'],
-            $arFieldInfo['row'],
-            $arFieldInfo
-        );
+        $result = parent::render();
+
         $evaluator = new LogicalExpressionEvaluator();
-        $arTokens = $evaluator->tokenize($arFieldInfo['itemFormElValue']);
+        $arTokens = $evaluator->tokenize($this->data['parameterArray']['itemFormElValue']);
 
         $arNotFound = [];
         $arUnknownTokens = [];
         foreach ($arTokens as $token) {
-            if (is_array($token)
-                && $token[0] === LogicalExpressionEvaluator::T_VAR
-            ) {
-                $contexts = Container::get()->initAll();
-                $bFound = false;
-                foreach ($contexts as $context) {
-                    if ($context->getAlias() == $token[1]) {
-                        $bFound = true;
+            if (is_array($token)) {
+                if ($token[0] === LogicalExpressionEvaluator::T_VAR) {
+                    $contexts = Container::get()->initAll();
+                    $bFound = false;
+                    foreach ($contexts as $context) {
+                        if ($context->getAlias() === $token[1]) {
+                            $bFound = true;
+                        }
                     }
-                }
 
-                if (!$bFound) {
-                    $arNotFound[] = $token[1];
+                    if (!$bFound) {
+                        $arNotFound[] = $token[1];
+                    }
+                } elseif ($token[0] === LogicalExpressionEvaluator::T_UNKNOWN) {
+                    $arUnknownTokens[] = $token[1];
                 }
-            } elseif (is_array($token)
-                && $token[0] === LogicalExpressionEvaluator::T_UNKNOWN
-            ) {
-                $arUnknownTokens[] = $token[1];
             }
         }
 
         if (!$arNotFound && !$arUnknownTokens) {
-            return $text;
+            return $result;
         }
 
+        $textarea = $result['html'];
+
         $html = <<<HTM
-$text<br />
+$textarea<br />
 <div class="typo3-message message-error">
     <div class="message-body">
 HTM;
@@ -85,7 +74,7 @@ HTM;
             $html .= <<<HTM
 <div>
     {$GLOBALS['LANG']->sL('LLL:EXT:contexts/Resources/Private/Language'
-        . '/flexform.xml:aliasesNotFound')}: $strNotFound
+                . '/flexform.xml:aliasesNotFound')}: $strNotFound
 </div>
 HTM;
         }
@@ -95,16 +84,12 @@ HTM;
             $html .= <<<HTM
 <div>
     {$GLOBALS['LANG']->sL('LLL:EXT:contexts/Resources/Private/Language'
-        . '/flexform.xml:unknownTokensFound')}: $strUnknownTokens
+                . '/flexform.xml:unknownTokensFound')}: $strUnknownTokens
 </div>
 HTM;
         }
 
-        $html .= <<<HTM
-    </div>
-</div>
-HTM;
-
-        return $html;
+        $result['html'] = $html;
+        return $result;
     }
 }

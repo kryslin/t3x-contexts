@@ -66,6 +66,11 @@ final class Setting
     /**
      * Create a context settings object from flat data
      *
+     * @param AbstractContext $context
+     * @param $table
+     * @param $setting
+     * @param $arFlatColumns
+     * @param $arRow
      * @return Setting|null NULL when not enabled/disabled
      */
     public static function fromFlatData(
@@ -74,7 +79,7 @@ final class Setting
         $setting,
         $arFlatColumns,
         $arRow
-    ) {
+    ): ?Setting {
         $bDisabled = strpos(
             ',' . $arRow[$arFlatColumns[0]] . ',',
             ',' . $context->getUid() . ','
@@ -98,7 +103,7 @@ final class Setting
         return new self($context, $arDummyRow);
     }
 
-    public function isDefaultSetting()
+    public function isDefaultSetting(): bool
     {
         return !$this->uid;
     }
@@ -106,7 +111,7 @@ final class Setting
     /**
      * @return AbstractContext
      */
-    public function getContext()
+    public function getContext(): AbstractContext
     {
         return $this->context;
     }
@@ -114,7 +119,7 @@ final class Setting
     /**
      * @return int
      */
-    public function getUid()
+    public function getUid(): int
     {
         return $this->uid;
     }
@@ -122,7 +127,7 @@ final class Setting
     /**
      * @return string
      */
-    public function getForeignTable()
+    public function getForeignTable(): string
     {
         return $this->foreignTable;
     }
@@ -130,7 +135,7 @@ final class Setting
     /**
      * @return int
      */
-    public function getForeignUid()
+    public function getForeignUid(): int
     {
         return $this->foreignUid;
     }
@@ -138,7 +143,7 @@ final class Setting
     /**
      * @return string
      */
-    public function getName()
+    public function getName(): string
     {
         return $this->name;
     }
@@ -146,7 +151,7 @@ final class Setting
     /**
      * @return bool
      */
-    public function getEnabled()
+    public function getEnabled(): bool
     {
         return $this->enabled;
     }

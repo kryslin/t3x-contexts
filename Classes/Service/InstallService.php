@@ -45,10 +45,8 @@ class InstallService
      *
      * @return array Either empty array or table create array
      */
-    public function appendTableDefinitions($arSignalReturn, $strExtKey)
+    public function appendTableDefinitions($arSignalReturn, $strExtKey): array
     {
-        global $TCA;
-
         $extensionFlatSettings = Configuration::getExtensionFlatSettings($strExtKey);
 
         if (!array_key_exists($strExtKey, $extensionFlatSettings)) {

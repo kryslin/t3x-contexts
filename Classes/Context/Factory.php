@@ -44,7 +44,7 @@ class Factory
      * @return AbstractContext|null
      * @throws \Netresearch\Contexts\ContextException
      */
-    public static function createFromDb($arRow)
+    public static function createFromDb($arRow): ?AbstractContext
     {
         $classMap = Configuration::getContextTypes();
 

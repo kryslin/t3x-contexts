@@ -41,7 +41,7 @@ class SessionContext extends AbstractContext
      *
      * @return bool True if the context is active, false if not
      */
-    public function match(array $arDependencies = [])
+    public function match(array $arDependencies = []): bool
     {
         /* @var $GLOBALS['TSFE'] \TYPO3\CMS\Frontend\Controller\TypoScriptFrontendController */
         $session = $GLOBALS['TSFE']->fe_user->getKey(

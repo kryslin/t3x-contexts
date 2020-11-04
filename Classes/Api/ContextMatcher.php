@@ -53,7 +53,7 @@ class ContextMatcher
      *
      * @return self One instance
      */
-    public static function getInstance()
+    public static function getInstance(): self
     {
         if (self::$instance === null) {
             self::$instance = new self();
@@ -64,7 +64,7 @@ class ContextMatcher
     /**
      * Unsets this instance
      */
-    public static function clearInstance()
+    public static function clearInstance(): void
     {
         self::$instance = null;
     }
@@ -76,7 +76,7 @@ class ContextMatcher
      *
      * @return bool TRUE if context matches, FALSE if not
      */
-    public function matches($strContext)
+    public function matches($strContext): bool
     {
         if (isset($this->arMatches[$strContext])) {
             return $this->arMatches[$strContext];

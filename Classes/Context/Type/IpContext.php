@@ -42,7 +42,7 @@ class IpContext extends AbstractContext
      *
      * @return bool True if the context is active, false if not
      */
-    public function match(array $arDependencies = [])
+    public function match(array $arDependencies = []): bool
     {
         $strCurIp = $_SERVER['REMOTE_ADDR'];
 

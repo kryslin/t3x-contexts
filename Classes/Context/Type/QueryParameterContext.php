@@ -44,7 +44,7 @@ class QueryParameterContext extends AbstractContext
      * @return bool True if the context is active, false if not
      * @throws \Exception
      */
-    public function match(array $arDependencies = [])
+    public function match(array $arDependencies = []): bool
     {
         $param = trim($this->getConfValue('field_name'));
         if ($param === '') {

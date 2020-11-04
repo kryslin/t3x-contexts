@@ -43,10 +43,10 @@ class IconService implements SingletonInterface
      * @param array  $row     The row of the actuall element.
      * @param array  &$status The actually status which already is set.
      */
-    public function overrideIconOverlay($table, $row, &$status)
+    public function overrideIconOverlay($table, $row, &$status): void
     {
-        if (isset($row['tx_contexts_enable']) && $row['tx_contexts_enable'] != '' ||
-            isset($row['tx_contexts_disable']) && $row['tx_contexts_disable'] != '') {
+        if ((isset($row['tx_contexts_enable']) && $row['tx_contexts_enable'] !== '') ||
+            (isset($row['tx_contexts_disable']) && $row['tx_contexts_disable'] !== '')) {
             $status['contexts'] = true;
         }
     }
@@ -63,12 +63,13 @@ class IconService implements SingletonInterface
      *
      * @return string the registered icon name
      */
-    public function postOverlayPriorityLookup($table, $row, &$status, $iconName)
+    public function postOverlayPriorityLookup($table, $row, &$status, $iconName): string
     {
-        if (isset($row['tx_contexts_enable']) && $row['tx_contexts_enable'] != '' ||
-            isset($row['tx_contexts_disable']) && $row['tx_contexts_disable'] != '') {
+        if ((isset($row['tx_contexts_enable']) && $row['tx_contexts_enable'] !== '') ||
+            (isset($row['tx_contexts_disable']) && $row['tx_contexts_disable'] !== '')) {
             $status['contexts'] = true;
             return 'extensions-contexts-status-overlay-contexts';
         }
+        return '';
     }
 }

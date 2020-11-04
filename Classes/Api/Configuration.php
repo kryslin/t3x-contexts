@@ -40,7 +40,7 @@ class Configuration
      *
      * @var string
      */
-    const LANG_FILE = 'EXT:contexts/Resources/Private/Language/locallang_db.xml';
+    public const LANG_FILE = 'EXT:contexts/Resources/Private/Language/locallang_db.xml';
 
     /**
      * The name of the contexts settings column in TCA
@@ -49,7 +49,7 @@ class Configuration
      *
      * @var string
      */
-    const RECORD_SETTINGS_COLUMN = 'tx_contexts_settings';
+    public const RECORD_SETTINGS_COLUMN = 'tx_contexts_settings';
 
     /**
      * Add context settings to a specific table. $settings can be
@@ -90,7 +90,7 @@ class Configuration
         $table,
         array $settings = null,
         $addDefaults = true
-    ) {
+    ): void {
         $defaultSettings = [
             'tx_contexts' => [
                 'label' => 'LLL:' . self::LANG_FILE . ':tx_contexts_visibility',
@@ -120,7 +120,7 @@ class Configuration
      *
      * @return bool
      */
-    protected static function isFlatSetting(array $config)
+    protected static function isFlatSetting(array $config): bool
     {
         return isset($config['flatten']) || isset($config['enables']);
     }
@@ -132,7 +132,7 @@ class Configuration
      * @param string $table    Table name
      * @param array  $settings Settings
      */
-    protected static function addToFlatColumns($table, array $settings)
+    protected static function addToFlatColumns($table, array $settings): void
     {
         $flatSettings = (array)$GLOBALS['TCA'][$table]['ctrl']['tx_contexts']['flatSettings'];
 
@@ -161,7 +161,7 @@ class Configuration
         $extKey,
         $table,
         array $settings
-    ) {
+    ): void {
         $flatSettings = [];
 
         foreach ($settings as $setting => $config) {
@@ -192,7 +192,7 @@ class Configuration
      * @param string $table    Table name
      * @param array  $settings Settings
      */
-    protected static function addToEnableSettings($table, array $settings)
+    protected static function addToEnableSettings($table, array $settings): void
     {
         $enableSettings = (array)$GLOBALS['TCA'][$table]['ctrl']['tx_contexts']['enableSettings'];
 
@@ -214,7 +214,7 @@ class Configuration
      * @param array  $settings Array of settings to register.
      *                         Key is the setting name, value its title
      */
-    protected static function addToTcaColumns($table, array $settings)
+    protected static function addToTcaColumns($table, array $settings): void
     {
         if (!isset($GLOBALS['TCA'][$table])) {
             return;
@@ -355,7 +355,7 @@ class Configuration
      *
      * @return array
      */
-    public static function getContextTypes()
+    public static function getContextTypes(): array
     {
         return (array)$GLOBALS['TCA']['tx_contexts_contexts']['contextTypes'];
     }
@@ -377,16 +377,14 @@ class Configuration
      *                   First name is the disable column,
      *                   second the enable column name.
      */
-    public static function getFlatColumns($table, $setting = null)
+    public static function getFlatColumns($table, $setting = null): array
     {
-        if ($table) {
-            if (isset($GLOBALS['TCA'][$table]['ctrl']['tx_contexts']['flatSettings'])) {
-                if ($setting) {
-                    return $GLOBALS['TCA'][$table]['ctrl']['tx_contexts']['flatSettings'][$setting];
-                }
-
-                return $GLOBALS['TCA'][$table]['ctrl']['tx_contexts']['flatSettings'];
+        if ($table && isset($GLOBALS['TCA'][$table]['ctrl']['tx_contexts']['flatSettings'])) {
+            if ($setting) {
+                return $GLOBALS['TCA'][$table]['ctrl']['tx_contexts']['flatSettings'][$setting];
             }
+
+            return $GLOBALS['TCA'][$table]['ctrl']['tx_contexts']['flatSettings'];
         }
 
         return [];
@@ -399,7 +397,7 @@ class Configuration
      *
      * @return array $extensionFlatSettings
      */
-    public static function getExtensionFlatSettings($strExtKey)
+    public static function getExtensionFlatSettings($strExtKey): array
     {
         if (!isset($GLOBALS['TCA']['tx_contexts_contexts']['extensionFlatSettings'][$strExtKey])) {
             return [];
@@ -415,7 +413,7 @@ class Configuration
      *
      * @return array $tcaCtrlEnablecolumns
      */
-    public static function getEnableSettings($table)
+    public static function getEnableSettings($table): array
     {
         return (array)$GLOBALS['TCA'][$table]['ctrl']['tx_contexts']['enableSettings'];
     }

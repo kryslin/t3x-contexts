@@ -22,7 +22,7 @@ use Netresearch\Contexts\Context\AbstractContext;
  */
 class DomainContext extends AbstractContext
 {
-    public function match(array $arDependencies = [])
+    public function match(array $arDependencies = []): bool
     {
         $curHost = $_SERVER['HTTP_HOST'];
         $arDomains = explode("\n", $this->getConfValue('field_domains'));

@@ -40,16 +40,6 @@ class FrontendControllerService implements SingletonInterface
     protected static $linkVarParams = [];
 
     /**
-     * Initialize the frontend user - contexts are initialized here.
-     *
-     * @param TypoScriptFrontendController $pObj Calling object
-     */
-    public function initFEuser($pObj)
-    {
-        Container::get()->initMatching();
-    }
-
-    /**
      * Check subpages for context from rootline
      * method is called from hook "hook_checkEnableFields"
      *
@@ -59,13 +49,13 @@ class FrontendControllerService implements SingletonInterface
      *
      * @return bool false if context from root does not match
      */
-    public function checkEnableFields($arData)
+    public function checkEnableFields($arData): bool
     {
         $contexts = Container::get();
         $bFindExtendSubPage = 0;
         foreach (array_reverse($arData['pObj']->rootLine) as $page) {
             //check extendtosubpages
-            if ($page['extendToSubpages'] == '0' && $bFindExtendSubPage == 0) {
+            if ($page['extendToSubpages'] === '0' && $bFindExtendSubPage === 0) {
                 continue;
             }
             $bFindExtendSubPage = 1;
@@ -84,6 +74,7 @@ class FrontendControllerService implements SingletonInterface
                 }
             }
         }
+        return false;
     }
 
     /**
@@ -97,7 +88,7 @@ class FrontendControllerService implements SingletonInterface
      * @param array &$params Array of parameters
      * @param null  $ref     Empty reference object
      */
-    public function createHashBase(&$params, $ref)
+    public function createHashBase(&$params, $ref): void
     {
         ksort(self::$params);
         $params['hashParameters'][strtolower(__CLASS__)] = serialize(self::$params);
@@ -109,7 +100,7 @@ class FrontendControllerService implements SingletonInterface
      * @param array    &$params
      * @param TypoScriptFrontendController $tsfe
      */
-    public function configArrayPostProc(&$params, $tsfe)
+    public function configArrayPostProc(&$params, $tsfe): void
     {
         $linkVars = $params['config']['linkVars'] . ',' . implode(',', array_keys(self::$linkVarParams));
         $params['config']['linkVars'] = trim($linkVars, ',');
@@ -120,9 +111,10 @@ class FrontendControllerService implements SingletonInterface
      * createHashBase/cHashParamsHook
      *
      * @param string $param
-     * @param mixed  $value
+     * @param mixed $value
+     * @param $addToLinkVars
      */
-    public static function registerQueryParameter($param, $value, $addToLinkVars)
+    public static function registerQueryParameter($param, $value, $addToLinkVars): void
     {
         self::$params[$param] = $value;
         if ($addToLinkVars) {

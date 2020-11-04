@@ -73,7 +73,8 @@ class AbstractTest extends \Netresearch\Contexts\Tests\Unit\TestBase
 
 class test extends \Netresearch\Contexts\Context\AbstractContext
 {
-    public function match(array $arDependencies = [])
+    public function match(array $arDependencies = []): bool
     {
+        return false;
     }
 }

@@ -30,7 +30,7 @@ class DefaultSettingsFormElement extends AbstractFormElement
      * Render a checkbox for the default settings of records in
      * this table
      */
-    public function render()
+    public function render(): array
     {
         $result = $this->initializeResultArray();
         $table = $this->data['tableName'];

@@ -19,7 +19,8 @@ use Netresearch\Contexts\Context\AbstractContext;
 
 class DefaultContext extends AbstractContext
 {
-    public function match(array $arDependencies = [])
+    public function match(array $arDependencies = []): bool
     {
+        return false;
     }
 }

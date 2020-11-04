@@ -53,7 +53,7 @@ class CombinationContext extends AbstractContext
      * @param array $arContexts the available contexts
      * @return array
      */
-    public function getDependencies($arContexts)
+    public function getDependencies($arContexts): array
     {
         $this->evaluator = new LogicalExpressionEvaluator();
         $this->tokens = $this->evaluator->tokenize($this->getConfValue('field_expression'));
@@ -63,7 +63,7 @@ class CombinationContext extends AbstractContext
                 && $token[0] === LogicalExpressionEvaluator::T_VAR
             ) {
                 foreach ($arContexts as $dependent) {
-                    if ($dependent->getAlias() == $token[1]) {
+                    if ($dependent->getAlias() === $token[1]) {
                         $context = $dependent;
                     }
                 }
@@ -88,8 +88,9 @@ class CombinationContext extends AbstractContext
      *
      * @param array $arDependencies
      * @return bool
+     * @noinspection PhpDocMissingThrowsInspection
      */
-    public function match(array $arDependencies = [])
+    public function match(array $arDependencies = []): bool
     {
         $this->evaluator->parse($this->tokens);
         $values = [];
