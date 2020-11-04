@@ -291,7 +291,6 @@ class Configuration
                 'config' => [
                     'type' => 'user',
                     'size' => 30,
-                    'userFunc' => 'Netresearch\Contexts\Form\DefaultSettingsFormElement->render',
                     'renderType' => 'DefaultSettingsFormElement',
                     'table' => $table,
                     'settings' => $settings

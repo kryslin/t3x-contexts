@@ -16,7 +16,6 @@
            <rows>5</rows>
            <eval>trim,required</eval>
            <renderType>CombinationFormElement</renderType>
-           <userFunc>Netresearch\Contexts\Form\CombinationFormElement->render</userFunc>
          </config>
        </TCEforms>
      </field_expression>
