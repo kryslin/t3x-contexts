@@ -26,6 +26,7 @@ namespace Netresearch\Contexts\Context;
 ***************************************************************/
 use Netresearch\Contexts\Api\Configuration;
 use Netresearch\Contexts\ContextException;
+use TYPO3\CMS\Core\Log\LogManager;
 use TYPO3\CMS\Core\SingletonInterface;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
@@ -51,11 +52,10 @@ class Factory
         $type     = $arRow['type'];
 
         if (!$type || !array_key_exists($type, $classMap)) {
-//            GeneralUtility::devLog(
-//                'No class found for context type "' . $type . '"',
-//                'tx_contexts',
-//                2
-//            );
+            $logger = GeneralUtility::makeInstance(LogManager::class)->getLogger(__CLASS__);
+            $logger->warning(
+                'No class found for context type "' . $type . '"'
+            );
             $type = 'default';
         }
 

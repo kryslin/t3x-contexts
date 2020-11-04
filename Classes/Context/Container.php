@@ -17,6 +17,7 @@ namespace Netresearch\Contexts\Context;
 
 use Psr\Http\Message\ServerRequestInterface;
 use TYPO3\CMS\Core\Context\Context;
+use TYPO3\CMS\Core\Log\LogManager;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Core\Database\Connection;
 use TYPO3\CMS\Core\Database\ConnectionPool;
@@ -98,14 +99,14 @@ class Container extends \ArrayObject
     {
         $this->exchangeArray($arContexts);
         $aliases = [];
+        /** @var AbstractContext $context */
         foreach ($arContexts as $context) {
-            $aliases[] = $context->getAlias();
+            $aliases[] = $context->getAlias() ?: $context->getTitle();
         }
-//        GeneralUtility::devLog(
-//            count($this) . ' active contexts: ' . implode(', ', $aliases),
-//            'tx_contexts',
-//            0
-//        );
+        $logger = GeneralUtility::makeInstance(LogManager::class)->getLogger(__CLASS__);
+        $logger->info(
+            count($this) . ' active contexts: ' . implode(', ', $aliases)
+        );
 
         return $this;
     }
@@ -224,9 +225,7 @@ class Container extends \ArrayObject
         }
 
         foreach ($this as $context) {
-            if ($context->getAlias() === strtolower($uidOrAlias)
-                || $context->getUid() == $uidOrAlias
-            ) {
+            if ($context->getUid() === $uidOrAlias || $context->getAlias() === strtolower($uidOrAlias)) {
                 return $context;
             }
         }

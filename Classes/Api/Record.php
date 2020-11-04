@@ -27,6 +27,8 @@ namespace Netresearch\Contexts\Api;
 
 use Netresearch\Contexts\Context\AbstractContext;
 use Netresearch\Contexts\Context\Container;
+use TYPO3\CMS\Core\Log\Logger;
+use TYPO3\CMS\Core\Log\LogManager;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
@@ -81,12 +83,10 @@ class Record
             }
 
             if (!isset($row['uid'])) {
-//                GeneralUtility::devLog(
-//                    'Missing uid field in row',
-//                    'tx_contexts',
-//                    GeneralUtility::SYSLOG_SEVERITY_WARNING,
-//                    ['table' => $table, 'row' => $row]
-//                );
+                self::getLogger()->warning(
+                    'Missing uid field in row',
+                    ['table' => $table, 'row' => $row]
+                );
                 return false;
             }
 
@@ -136,12 +136,10 @@ class Record
 
         foreach ($flatColumns as $i => $flatColumn) {
             if (!array_key_exists($flatColumn, $row)) {
-//                GeneralUtility::devLog(
-//                    'Missing flat field "' . $flatColumn . '"',
-//                    'tx_contexts',
-//                    GeneralUtility::SYSLOG_SEVERITY_WARNING,
-//                    ['table' => $table, 'row' => $row]
-//                );
+                self::getLogger()->warning(
+                    'Missing flat field "' . $flatColumn . '"',
+                    ['table' => $table, 'row' => $row]
+                );
                 $rowValid = false;
             } elseif ($row[$flatColumn] !== '') {
                 $flatColumnContents[$i]
@@ -162,5 +160,10 @@ class Record
         }
 
         return true;
+    }
+
+    protected static function getLogger(): Logger
+    {
+        return GeneralUtility::makeInstance(LogManager::class)->getLogger(__CLASS__);
     }
 }
