@@ -51,6 +51,8 @@ class Configuration
      */
     public const RECORD_SETTINGS_COLUMN = 'tx_contexts_settings';
 
+    public const RECORD_LANGUAGE_COLUMN = 'sys_language_uid';
+
     /**
      * Add context settings to a specific table. $settings can be
      * any (boolean) settings, each with the name as key and array

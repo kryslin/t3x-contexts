@@ -39,6 +39,7 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 class DataHandlerService
 {
     protected $currentSettings;
+    protected $currentLanguage;
 
     /**
      * Extract the context settings from the field array and set them in
@@ -72,6 +73,7 @@ class DataHandlerService
 
         if (isset($incomingFieldArray[Configuration::RECORD_SETTINGS_COLUMN])) {
             $this->currentSettings = $incomingFieldArray[Configuration::RECORD_SETTINGS_COLUMN];
+            $this->currentLanguage = (int)$incomingFieldArray[Configuration::RECORD_LANGUAGE_COLUMN];
             unset($incomingFieldArray[Configuration::RECORD_SETTINGS_COLUMN]);
         }
     }
@@ -101,6 +103,7 @@ class DataHandlerService
             } else {
                 $this->saveRecordSettings($table, $id, $this->currentSettings);
                 $this->saveFlatSettings($table, $id, $this->currentSettings);
+                $this->updateContextFieldInOtherLanguages($table, $id);
             }
 
             unset($this->currentSettings);
@@ -268,6 +271,26 @@ class DataHandlerService
                         ])
                         ->execute();
                 }
+            }
+        }
+    }
+
+    protected function updateContextFieldInOtherLanguages(string $table, int $uid): void
+    {
+        if ($this->currentLanguage === 0) {
+            $queryBuilder = $this->getDatabaseConnection()->createQueryBuilder();
+            $translations = $queryBuilder->select('uid')
+                ->from($table)
+                ->where(
+                    $queryBuilder->expr()->eq(
+                        'l10n_parent',
+                        $queryBuilder->createNamedParameter($uid, \PDO::PARAM_INT)
+                    )
+                )->execute()
+                ->fetchAssociative();
+
+            foreach ($translations as $translation) {
+                $this->saveFlatSettings($table, $translation['uid'], $this->currentSettings);
             }
         }
     }
