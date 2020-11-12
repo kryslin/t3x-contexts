@@ -176,7 +176,7 @@ abstract class AbstractContext
         $sheet   = 'sDEF',
         $lang    = 'lDEF',
         $value   = 'vDEF'
-    ): string {
+    ): ?string {
         if (!isset($this->conf['data'][$sheet][$lang])) {
             return $default;
         }

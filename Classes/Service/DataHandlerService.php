@@ -286,8 +286,9 @@ class DataHandlerService
                         'l10n_parent',
                         $queryBuilder->createNamedParameter($uid, \PDO::PARAM_INT)
                     )
-                )->execute()
-                ->fetchAssociative();
+                )
+                ->execute()
+                ->fetchAllAssociative();
 
             foreach ($translations as $translation) {
                 $this->saveFlatSettings($table, $translation['uid'], $this->currentSettings);
