@@ -279,11 +279,12 @@ class DataHandlerService
     {
         if ($this->currentLanguage === 0) {
             $queryBuilder = $this->getDatabaseConnection()->createQueryBuilder();
+            $column = $GLOBALS['TCA'][$table]['ctrl']['transOrigPointerField'];
             $translations = $queryBuilder->select('uid')
                 ->from($table)
                 ->where(
                     $queryBuilder->expr()->eq(
-                        'l10n_parent',
+                        $column,
                         $queryBuilder->createNamedParameter($uid, \PDO::PARAM_INT)
                     )
                 )
